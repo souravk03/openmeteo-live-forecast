@@ -1,360 +1,351 @@
 {
-  "generated_at": "2026-06-16T04:25:57.254081",
+  "generated_at": "2026-06-16T23:46:46.758701",
   "cities": {
     "Mumbai": {
-      "verified_rows": 3,
-      "per_target": {
+      "n_verified": 3,
+      "targets": {
         "PRmsl": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 119.0016,
-            "mae_last7": 119.0016
+          "n": 1,
+          "unit": "Pa",
+          "models": {
+            "ensemble": {
+              "mae": 182.1686,
+              "rmse": 182.1686,
+              "p90": 182.1686,
+              "best_n": 0
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 98.6182,
+              "rmse": 98.6182,
+              "p90": 98.6182,
+              "best_n": 1
+            },
+            "MV_GRU": {
+              "mae": 107.8545,
+              "rmse": 107.8545,
+              "p90": 107.8545,
+              "best_n": 0
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 220.7834,
+              "rmse": 220.7834,
+              "p90": 220.7834,
+              "best_n": 0
+            },
+            "UV_GRU": {
+              "mae": 301.4184,
+              "rmse": 301.4184,
+              "p90": 301.4184,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 145.5975,
-            "mae_last7": 145.5975
-          },
-          "uv_ANN": {
-            "mae_all": 77.1331,
-            "mae_last7": 77.1331
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 9.4594,
-            "mae_last7": 9.4594
-          },
-          "mv_GRU": {
-            "mae_all": 121.183,
-            "mae_last7": 121.183
-          },
-          "mv_ANN": {
-            "mae_all": 148.3822,
-            "mae_last7": 148.3822
-          },
-          "ensemble_uv": {
-            "mae_all": 113.9108,
-            "mae_last7": 113.9108
-          },
-          "ensemble_mv": {
-            "mae_all": 93.0082,
-            "mae_last7": 93.0082
-          },
-          "ensemble_all": {
-            "mae_all": 103.4595,
-            "mae_last7": 103.4595
-          }
+          "best_model": "MV_HLSTM_GRU"
         },
         "RH2m": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 2.5868,
-            "mae_last7": 2.5868
+          "n": 1,
+          "unit": "%",
+          "models": {
+            "ensemble": {
+              "mae": 0.4113,
+              "rmse": 0.4113,
+              "p90": 0.4113,
+              "best_n": 1
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 7.7985,
+              "rmse": 7.7985,
+              "p90": 7.7985,
+              "best_n": 0
+            },
+            "MV_GRU": {
+              "mae": 12.7838,
+              "rmse": 12.7838,
+              "p90": 12.7838,
+              "best_n": 0
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 5.3207,
+              "rmse": 5.3207,
+              "p90": 5.3207,
+              "best_n": 0
+            },
+            "UV_GRU": {
+              "mae": 1.9807,
+              "rmse": 1.9807,
+              "p90": 1.9807,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 0.4497,
-            "mae_last7": 0.4497
-          },
-          "uv_ANN": {
-            "mae_all": 3.1112,
-            "mae_last7": 3.1112
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 1.2499,
-            "mae_last7": 1.2499
-          },
-          "mv_GRU": {
-            "mae_all": 1.3215,
-            "mae_last7": 1.3215
-          },
-          "mv_ANN": {
-            "mae_all": 1.86,
-            "mae_last7": 1.86
-          },
-          "ensemble_uv": {
-            "mae_all": 2.0493,
-            "mae_last7": 2.0493
-          },
-          "ensemble_mv": {
-            "mae_all": 0.6439,
-            "mae_last7": 0.6439
-          },
-          "ensemble_all": {
-            "mae_all": 1.3466,
-            "mae_last7": 1.3466
-          }
+          "best_model": "ensemble"
         },
         "TMP2m": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 0.6365,
-            "mae_last7": 0.6365
+          "n": 1,
+          "unit": "C",
+          "models": {
+            "ensemble": {
+              "mae": 0.7358,
+              "rmse": 0.7358,
+              "p90": 0.7358,
+              "best_n": 0
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 0.6997,
+              "rmse": 0.6997,
+              "p90": 0.6997,
+              "best_n": 1
+            },
+            "MV_GRU": {
+              "mae": 2.3316,
+              "rmse": 2.3316,
+              "p90": 2.3316,
+              "best_n": 0
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 1.2955,
+              "rmse": 1.2955,
+              "p90": 1.2955,
+              "best_n": 0
+            },
+            "UV_GRU": {
+              "mae": 3.2794,
+              "rmse": 3.2794,
+              "p90": 3.2794,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 0.2155,
-            "mae_last7": 0.2155
-          },
-          "uv_ANN": {
-            "mae_all": 0.4096,
-            "mae_last7": 0.4096
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 0.0825,
-            "mae_last7": 0.0825
-          },
-          "mv_GRU": {
-            "mae_all": 0.4405,
-            "mae_last7": 0.4405
-          },
-          "mv_ANN": {
-            "mae_all": 0.3136,
-            "mae_last7": 0.3136
-          },
-          "ensemble_uv": {
-            "mae_all": 0.0038,
-            "mae_last7": 0.0038
-          },
-          "ensemble_mv": {
-            "mae_all": 0.2789,
-            "mae_last7": 0.2789
-          },
-          "ensemble_all": {
-            "mae_all": 0.1413,
-            "mae_last7": 0.1413
-          }
+          "best_model": "MV_HLSTM_GRU"
         }
       }
     },
     "Delhi": {
-      "verified_rows": 3,
-      "per_target": {
+      "n_verified": 3,
+      "targets": {
         "PRmsl": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 151.054,
-            "mae_last7": 151.054
+          "n": 1,
+          "unit": "Pa",
+          "models": {
+            "ensemble": {
+              "mae": 199.1242,
+              "rmse": 199.1242,
+              "p90": 199.1242,
+              "best_n": 0
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 55.3944,
+              "rmse": 55.3944,
+              "p90": 55.3944,
+              "best_n": 1
+            },
+            "MV_GRU": {
+              "mae": 220.6068,
+              "rmse": 220.6068,
+              "p90": 220.6068,
+              "best_n": 0
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 262.6547,
+              "rmse": 262.6547,
+              "p90": 262.6547,
+              "best_n": 0
+            },
+            "UV_GRU": {
+              "mae": 257.8407,
+              "rmse": 257.8407,
+              "p90": 257.8407,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 66.7585,
-            "mae_last7": 66.7585
-          },
-          "uv_ANN": {
-            "mae_all": 98.2682,
-            "mae_last7": 98.2682
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 348.345,
-            "mae_last7": 348.345
-          },
-          "mv_GRU": {
-            "mae_all": 786.7187,
-            "mae_last7": 786.7187
-          },
-          "mv_ANN": {
-            "mae_all": 249.2925,
-            "mae_last7": 249.2925
-          },
-          "ensemble_uv": {
-            "mae_all": 105.3602,
-            "mae_last7": 105.3602
-          },
-          "ensemble_mv": {
-            "mae_all": 461.4521,
-            "mae_last7": 461.4521
-          },
-          "ensemble_all": {
-            "mae_all": 178.0459,
-            "mae_last7": 178.0459
-          }
+          "best_model": "MV_HLSTM_GRU"
         },
         "RH2m": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 19.0405,
-            "mae_last7": 19.0405
+          "n": 1,
+          "unit": "%",
+          "models": {
+            "ensemble": {
+              "mae": 35.0256,
+              "rmse": 35.0256,
+              "p90": 35.0256,
+              "best_n": 0
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 21.0973,
+              "rmse": 21.0973,
+              "p90": 21.0973,
+              "best_n": 1
+            },
+            "MV_GRU": {
+              "mae": 47.938,
+              "rmse": 47.938,
+              "p90": 47.938,
+              "best_n": 0
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 24.0821,
+              "rmse": 24.0821,
+              "p90": 24.0821,
+              "best_n": 0
+            },
+            "UV_GRU": {
+              "mae": 46.9853,
+              "rmse": 46.9853,
+              "p90": 46.9853,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 12.5338,
-            "mae_last7": 12.5338
-          },
-          "uv_ANN": {
-            "mae_all": 11.3369,
-            "mae_last7": 11.3369
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 10.9776,
-            "mae_last7": 10.9776
-          },
-          "mv_GRU": {
-            "mae_all": 17.0798,
-            "mae_last7": 17.0798
-          },
-          "mv_ANN": {
-            "mae_all": 16.7811,
-            "mae_last7": 16.7811
-          },
-          "ensemble_uv": {
-            "mae_all": 14.3037,
-            "mae_last7": 14.3037
-          },
-          "ensemble_mv": {
-            "mae_all": 14.9462,
-            "mae_last7": 14.9462
-          },
-          "ensemble_all": {
-            "mae_all": 14.6249,
-            "mae_last7": 14.6249
-          }
+          "best_model": "MV_HLSTM_GRU"
         },
         "TMP2m": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 7.4431,
-            "mae_last7": 7.4431
+          "n": 1,
+          "unit": "C",
+          "models": {
+            "ensemble": {
+              "mae": 2.672,
+              "rmse": 2.672,
+              "p90": 2.672,
+              "best_n": 0
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 2.4019,
+              "rmse": 2.4019,
+              "p90": 2.4019,
+              "best_n": 0
+            },
+            "MV_GRU": {
+              "mae": 4.9177,
+              "rmse": 4.9177,
+              "p90": 4.9177,
+              "best_n": 0
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 0.5609,
+              "rmse": 0.5609,
+              "p90": 0.5609,
+              "best_n": 1
+            },
+            "UV_GRU": {
+              "mae": 2.8075,
+              "rmse": 2.8075,
+              "p90": 2.8075,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 2.4324,
-            "mae_last7": 2.4324
-          },
-          "uv_ANN": {
-            "mae_all": 0.5357,
-            "mae_last7": 0.5357
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 0.7374,
-            "mae_last7": 0.7374
-          },
-          "mv_GRU": {
-            "mae_all": 0.1867,
-            "mae_last7": 0.1867
-          },
-          "mv_ANN": {
-            "mae_all": 0.7303,
-            "mae_last7": 0.7303
-          },
-          "ensemble_uv": {
-            "mae_all": 3.4704,
-            "mae_last7": 3.4704
-          },
-          "ensemble_mv": {
-            "mae_all": 0.5515,
-            "mae_last7": 0.5515
-          },
-          "ensemble_all": {
-            "mae_all": 2.0109,
-            "mae_last7": 2.0109
-          }
+          "best_model": "UV_HLSTM_GRU"
         }
       }
     },
     "Chennai": {
-      "verified_rows": 3,
-      "per_target": {
+      "n_verified": 3,
+      "targets": {
         "PRmsl": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 7.7739,
-            "mae_last7": 7.7739
+          "n": 1,
+          "unit": "Pa",
+          "models": {
+            "ensemble": {
+              "mae": 128.8297,
+              "rmse": 128.8297,
+              "p90": 128.8297,
+              "best_n": 0
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 188.3719,
+              "rmse": 188.3719,
+              "p90": 188.3719,
+              "best_n": 0
+            },
+            "MV_GRU": {
+              "mae": 32.1153,
+              "rmse": 32.1153,
+              "p90": 32.1153,
+              "best_n": 1
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 137.4075,
+              "rmse": 137.4075,
+              "p90": 137.4075,
+              "best_n": 0
+            },
+            "UV_GRU": {
+              "mae": 157.4241,
+              "rmse": 157.4241,
+              "p90": 157.4241,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 26.3397,
-            "mae_last7": 26.3397
-          },
-          "uv_ANN": {
-            "mae_all": 27.4123,
-            "mae_last7": 27.4123
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 19.1818,
-            "mae_last7": 19.1818
-          },
-          "mv_GRU": {
-            "mae_all": 7.5739,
-            "mae_last7": 7.5739
-          },
-          "mv_ANN": {
-            "mae_all": 24.5481,
-            "mae_last7": 24.5481
-          },
-          "ensemble_uv": {
-            "mae_all": 2.2338,
-            "mae_last7": 2.2338
-          },
-          "ensemble_mv": {
-            "mae_all": 17.1013,
-            "mae_last7": 17.1013
-          },
-          "ensemble_all": {
-            "mae_all": 7.4338,
-            "mae_last7": 7.4338
-          }
+          "best_model": "MV_GRU"
         },
         "RH2m": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 6.5245,
-            "mae_last7": 6.5245
+          "n": 1,
+          "unit": "%",
+          "models": {
+            "ensemble": {
+              "mae": 9.3211,
+              "rmse": 9.3211,
+              "p90": 9.3211,
+              "best_n": 0
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 15.6447,
+              "rmse": 15.6447,
+              "p90": 15.6447,
+              "best_n": 0
+            },
+            "MV_GRU": {
+              "mae": 3.1397,
+              "rmse": 3.1397,
+              "p90": 3.1397,
+              "best_n": 1
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 13.998,
+              "rmse": 13.998,
+              "p90": 13.998,
+              "best_n": 0
+            },
+            "UV_GRU": {
+              "mae": 4.5022,
+              "rmse": 4.5022,
+              "p90": 4.5022,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 2.6247,
-            "mae_last7": 2.6247
-          },
-          "uv_ANN": {
-            "mae_all": 4.1796,
-            "mae_last7": 4.1796
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 1.7627,
-            "mae_last7": 1.7627
-          },
-          "mv_GRU": {
-            "mae_all": 3.0731,
-            "mae_last7": 3.0731
-          },
-          "mv_ANN": {
-            "mae_all": 6.7589,
-            "mae_last7": 6.7589
-          },
-          "ensemble_uv": {
-            "mae_all": 4.443,
-            "mae_last7": 4.443
-          },
-          "ensemble_mv": {
-            "mae_all": 3.8649,
-            "mae_last7": 3.8649
-          },
-          "ensemble_all": {
-            "mae_all": 4.1539,
-            "mae_last7": 4.1539
-          }
+          "best_model": "MV_GRU"
         },
         "TMP2m": {
-          "uv_HLSTM_GRU": {
-            "mae_all": 0.8096,
-            "mae_last7": 0.8096
+          "n": 1,
+          "unit": "C",
+          "models": {
+            "ensemble": {
+              "mae": 3.8275,
+              "rmse": 3.8275,
+              "p90": 3.8275,
+              "best_n": 0
+            },
+            "MV_HLSTM_GRU": {
+              "mae": 4.0537,
+              "rmse": 4.0537,
+              "p90": 4.0537,
+              "best_n": 0
+            },
+            "MV_GRU": {
+              "mae": 3.4087,
+              "rmse": 3.4087,
+              "p90": 3.4087,
+              "best_n": 1
+            },
+            "UV_HLSTM_GRU": {
+              "mae": 4.3625,
+              "rmse": 4.3625,
+              "p90": 4.3625,
+              "best_n": 0
+            },
+            "UV_GRU": {
+              "mae": 3.4851,
+              "rmse": 3.4851,
+              "p90": 3.4851,
+              "best_n": 0
+            }
           },
-          "uv_GRU": {
-            "mae_all": 0.6747,
-            "mae_last7": 0.6747
-          },
-          "uv_ANN": {
-            "mae_all": 1.0199,
-            "mae_last7": 1.0199
-          },
-          "mv_HLSTM_GRU": {
-            "mae_all": 1.2458,
-            "mae_last7": 1.2458
-          },
-          "mv_GRU": {
-            "mae_all": 0.5087,
-            "mae_last7": 0.5087
-          },
-          "mv_ANN": {
-            "mae_all": 0.4165,
-            "mae_last7": 0.4165
-          },
-          "ensemble_uv": {
-            "mae_all": 0.295,
-            "mae_last7": 0.295
-          },
-          "ensemble_mv": {
-            "mae_all": 0.7237,
-            "mae_last7": 0.7237
-          },
-          "ensemble_all": {
-            "mae_all": 0.5093,
-            "mae_last7": 0.5093
-          }
+          "best_model": "MV_GRU"
         }
       }
     }
