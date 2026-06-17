@@ -1,11 +1,17 @@
 {
-  "generated_at": "2026-06-17T15:54:56.983858",
-  "forecast_date": "2026-06-17",
+  "generated_at": "2026-06-17T17:01:57.708815",
+  "run_date": "2026-06-17",
   "data_source": "open_meteo_era5",
   "cities": {
     "Mumbai": {
       "lat": 19.11,
       "lon": 72.85,
+      "data_freshness": {
+        "requested_end": "2026-06-16",
+        "effective_end": "2026-06-16",
+        "fell_back": false,
+        "retries_used": 0
+      },
       "forecasts": {
         "PRmsl": {
           "uv_HLSTM_GRU": 100690.2648,
@@ -48,6 +54,12 @@
     "Delhi": {
       "lat": 28.61,
       "lon": 77.2,
+      "data_freshness": {
+        "requested_end": "2026-06-16",
+        "effective_end": "2026-06-16",
+        "fell_back": false,
+        "retries_used": 0
+      },
       "forecasts": {
         "PRmsl": {
           "uv_HLSTM_GRU": 100213.2854,
@@ -90,6 +102,12 @@
     "Chennai": {
       "lat": 13.08,
       "lon": 80.27,
+      "data_freshness": {
+        "requested_end": "2026-06-16",
+        "effective_end": "2026-06-16",
+        "fell_back": false,
+        "retries_used": 0
+      },
       "forecasts": {
         "PRmsl": {
           "uv_HLSTM_GRU": 100549.2549,
