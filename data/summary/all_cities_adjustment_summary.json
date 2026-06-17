@@ -1,20 +1,20 @@
 {
-  "generated_at": "2026-06-16T04:25:57.286816",
+  "generated_at": "2026-06-17T04:53:35.133428",
   "cities": {
     "Mumbai": {
-      "date": "2026-06-15",
+      "date": "2026-06-16",
       "city": "Mumbai",
       "adjusted": false,
       "groups": {}
     },
     "Delhi": {
-      "date": "2026-06-15",
+      "date": "2026-06-16",
       "city": "Delhi",
       "adjusted": false,
       "groups": {}
     },
     "Chennai": {
-      "date": "2026-06-15",
+      "date": "2026-06-16",
       "city": "Chennai",
       "adjusted": false,
       "groups": {}
