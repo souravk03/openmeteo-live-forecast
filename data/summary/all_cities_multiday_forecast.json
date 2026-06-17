@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-17T14:38:54.683991",
+  "generated_at": "2026-06-17T15:54:57.024364",
   "horizon": 5,
   "data_source": "open_meteo_era5",
   "note": "aux_vars_carried=true means WS/WD/SW_rad/PRCP held constant from last observed row",
