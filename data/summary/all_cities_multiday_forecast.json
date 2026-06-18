@@ -1,8 +1,7 @@
 {
-  "generated_at": "2026-06-18T09:15:47.792415",
+  "generated_at": "2026-06-18T09:26:34.706997",
   "horizon": 5,
   "data_source": "open_meteo_era5",
-  "note": "aux_vars_carried=true means WS/WD/SW_rad/PRCP held constant from last observed row",
   "cities": {
     "Mumbai": {
       "lat": 19.11,
@@ -11,7 +10,6 @@
         {
           "horizon": 1,
           "forecast_date": "2026-06-18",
-          "aux_vars_carried": false,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100803.2439,
@@ -54,7 +52,6 @@
         {
           "horizon": 2,
           "forecast_date": "2026-06-19",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100697.841,
@@ -97,7 +94,6 @@
         {
           "horizon": 3,
           "forecast_date": "2026-06-20",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100684.8162,
@@ -140,7 +136,6 @@
         {
           "horizon": 4,
           "forecast_date": "2026-06-21",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100702.9385,
@@ -183,7 +178,6 @@
         {
           "horizon": 5,
           "forecast_date": "2026-06-22",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100690.2065,
@@ -232,7 +226,6 @@
         {
           "horizon": 1,
           "forecast_date": "2026-06-18",
-          "aux_vars_carried": false,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100504.3928,
@@ -275,7 +268,6 @@
         {
           "horizon": 2,
           "forecast_date": "2026-06-19",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100417.0033,
@@ -318,7 +310,6 @@
         {
           "horizon": 3,
           "forecast_date": "2026-06-20",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100415.2651,
@@ -361,7 +352,6 @@
         {
           "horizon": 4,
           "forecast_date": "2026-06-21",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100391.635,
@@ -404,7 +394,6 @@
         {
           "horizon": 5,
           "forecast_date": "2026-06-22",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100356.3699,
@@ -453,7 +442,6 @@
         {
           "horizon": 1,
           "forecast_date": "2026-06-18",
-          "aux_vars_carried": false,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100566.2291,
@@ -496,7 +484,6 @@
         {
           "horizon": 2,
           "forecast_date": "2026-06-19",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100538.3344,
@@ -539,7 +526,6 @@
         {
           "horizon": 3,
           "forecast_date": "2026-06-20",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100546.7525,
@@ -582,7 +568,6 @@
         {
           "horizon": 4,
           "forecast_date": "2026-06-21",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100552.1277,
@@ -625,7 +610,6 @@
         {
           "horizon": 5,
           "forecast_date": "2026-06-22",
-          "aux_vars_carried": true,
           "forecasts": {
             "PRmsl": {
               "uv_HLSTM_GRU": 100547.5373,
