@@ -168,5 +168,11 @@
     "city": "Mumbai",
     "adjusted": false,
     "groups": {}
+  },
+  {
+    "date": "2026-06-20",
+    "city": "Mumbai",
+    "adjusted": false,
+    "groups": {}
   }
 ]
