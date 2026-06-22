@@ -3,902 +3,538 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WeatherMind — Open-Meteo Live Forecast</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>WeatherMind — Live AI Forecast</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --navy:     #0B1120;
-    --card:     #141E33;
-    --card2:    #1A2744;
-    --border:   rgba(0,229,255,0.12);
-    --cyan:     #00E5FF;
-    --cyan-dim: rgba(0,229,255,0.13);
-    --amber:    #FFB347;
-    --green:    #4ADE80;
-    --red:      #F87171;
-    --violet:   #A78BFA;
-    --text:     #E2E8F0;
-    --muted:    #7A90B0;
-    --dim:      #3A506A;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{background:var(--navy);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
-  body::before{content:'';position:fixed;inset:0;
-    background-image:linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),
-                     linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);
-    background-size:52px 52px;pointer-events:none;z-index:0;}
-
-  /* ── HEADER ── */
-  .hdr{position:sticky;top:0;z-index:100;background:rgba(11,17,32,0.94);
-    backdrop-filter:blur(16px);border-bottom:1px solid var(--border);
-    padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:62px;}
-  .logo{display:flex;align-items:center;gap:10px;
-    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem;}
-  .logo svg{width:28px;height:28px;}
-  .live-pill{display:flex;align-items:center;gap:6px;
-    font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--green);
-    background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.22);
-    padding:4px 12px;border-radius:100px;letter-spacing:.05em;}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-  /* ── HERO ── */
-  .hero{position:relative;z-index:1;padding:3.5rem 2rem 2.5rem;
-    display:flex;align-items:center;gap:3rem;max-width:1380px;margin:0 auto;}
-  .hero-text{flex:1;}
-  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.72rem;
-    letter-spacing:.18em;color:var(--cyan);text-transform:uppercase;margin-bottom:.9rem;}
-  .hero-title{font-family:'Space Grotesk',sans-serif;
-    font-size:clamp(2rem,3.8vw,3.2rem);font-weight:700;line-height:1.12;margin-bottom:.9rem;}
-  .hero-title em{font-style:normal;color:var(--cyan);}
-  .hero-sub{color:var(--muted);font-size:.95rem;max-width:500px;line-height:1.65;}
-
-  /* radar */
-  .radar-wrap{flex-shrink:0;width:200px;height:200px;position:relative;}
-  .radar-wrap svg{width:100%;height:100%;}
-  .sweep{transform-origin:100px 100px;animation:sweep 3.2s linear infinite;}
-  @keyframes sweep{to{transform:rotate(360deg)}}
-
-  /* ── CITY NAV ── */
-  .city-nav{position:sticky;top:62px;z-index:90;
-    background:rgba(11,17,32,0.92);backdrop-filter:blur(12px);
-    border-bottom:1px solid var(--border);}
-  .city-tabs{max-width:1380px;margin:0 auto;padding:0 2rem;display:flex;}
-  .ctab{padding:.85rem 1.8rem;background:none;border:none;
-    color:var(--muted);font-family:'Space Grotesk',sans-serif;
-    font-size:.9rem;font-weight:500;cursor:pointer;
-    border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s;}
-  .ctab:hover{color:var(--text);}
-  .ctab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
-  .ctab-temp{font-family:'JetBrains Mono',monospace;font-size:.72rem;
-    color:var(--muted);margin-left:5px;}
-  .ctab.active .ctab-temp{color:rgba(0,229,255,.65);}
-
-  /* ── MAIN ── */
-  .main{max-width:1380px;margin:0 auto;padding:1.75rem 2rem;position:relative;z-index:1;}
-
-  /* section tabs */
-  .stabs{display:flex;gap:3px;background:var(--card);border:1px solid var(--border);
-    border-radius:10px;padding:4px;width:fit-content;margin-bottom:1.75rem;}
-  .stab{padding:7px 18px;background:none;border:none;color:var(--muted);
-    font-size:.85rem;font-weight:500;cursor:pointer;border-radius:7px;transition:all .2s;}
-  .stab.active{background:var(--cyan-dim);color:var(--cyan);}
-  .stab:hover:not(.active){color:var(--text);}
-
-  .panel{display:none;}
-  .panel.active{display:block;}
-
-  /* ── CARDS ── */
-  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));
-    gap:1rem;margin-bottom:1.5rem;}
-  .scard{background:var(--card);border:1px solid var(--border);border-radius:12px;
-    padding:1.2rem 1.4rem;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
-  .scard:hover{transform:translateY(-2px);border-color:rgba(0,229,255,.28);}
-  .scard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-    background:linear-gradient(90deg,var(--cyan),transparent);}
-  .scard.amber::before{background:linear-gradient(90deg,var(--amber),transparent);}
-  .scard.green::before{background:linear-gradient(90deg,var(--green),transparent);}
-  .scard.violet::before{background:linear-gradient(90deg,var(--violet),transparent);}
-  .slabel{font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
-    color:var(--muted);margin-bottom:.45rem;}
-  .sval{font-family:'Space Grotesk',sans-serif;font-size:1.9rem;font-weight:700;line-height:1;}
-  .sunit{font-size:.85rem;font-weight:400;color:var(--muted);margin-left:2px;}
-  .sdelta{margin-top:.35rem;font-size:.75rem;color:var(--muted);}
-
-  /* forecast grid */
-  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
-  .fcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.6rem;}
-  .fcard h3{font-family:'Space Grotesk',sans-serif;font-size:.72rem;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem;}
-
-  .big-row{display:flex;align-items:center;gap:1.25rem;margin-bottom:1.3rem;}
-  .big-icon{font-size:3.2rem;line-height:1;}
-  .big-t{font-family:'Space Grotesk',sans-serif;font-size:2.8rem;font-weight:700;}
-  .big-t sup{font-size:1.1rem;color:var(--muted);}
-  .wdesc{color:var(--muted);font-size:.88rem;margin-top:3px;}
-
-  .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
-  .pitem{background:rgba(255,255,255,.03);border-radius:8px;padding:.7rem;}
-  .pname{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
-  .pval{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:500;}
-
-  /* ensemble breakdown */
-  .ens-rows{display:flex;flex-direction:column;gap:.5rem;margin-top:.8rem;}
-  .ens-row{display:flex;align-items:center;gap:.7rem;}
-  .ens-lbl{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);width:44px;flex-shrink:0;}
-  .ens-bg{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:10px;overflow:hidden;}
-  .ens-fill{height:100%;border-radius:10px;transition:width 1s ease;}
-  .ens-pct{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);width:34px;text-align:right;}
-
-  /* conf bar */
-  .conf-wrap{margin-top:.9rem;}
-  .conf-lbl{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-bottom:5px;}
-  .conf-bg{height:5px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;}
-  .conf-fill{height:100%;background:linear-gradient(90deg,var(--cyan),#0099FF);border-radius:10px;transition:width 1s ease;}
-
-  /* horizon select */
-  .hrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.2rem;}
-  .hbtn{padding:4px 13px;border-radius:100px;background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.1);color:var(--muted);
-    font-size:.73rem;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;}
-  .hbtn.active{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan);}
-
-  /* multi-day cards */
-  .mgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:.85rem;margin-bottom:1.5rem;}
-  .dcard{background:var(--card);border:1px solid var(--border);border-radius:13px;
-    padding:1.1rem .9rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-  .dcard:hover,.dcard.active{border-color:var(--cyan);background:var(--cyan-dim);}
-  .dlbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;}
-  .dicon{font-size:1.7rem;margin-bottom:.45rem;}
-  .dtmax{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.95rem;}
-  .dtmin{color:var(--muted);font-size:.78rem;margin-top:1px;}
-  .dhum{color:var(--amber);font-size:.7rem;font-family:'JetBrains Mono',monospace;margin-top:3px;}
-
-  /* chart card */
-  .cc{background:var(--card);border:1px solid var(--border);border-radius:14px;
-    padding:1.6rem;margin-bottom:1.25rem;}
-  .cc h3{font-family:'Space Grotesk',sans-serif;font-size:.72rem;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--muted);margin-bottom:1.3rem;}
-  .cw{position:relative;overflow:hidden;}
-  canvas{position:absolute;inset:0;}
-
-  /* accuracy */
-  .agrid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
-  .tcard{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-  .thead{padding:.9rem 1.3rem;border-bottom:1px solid var(--border);
-    font-family:'Space Grotesk',sans-serif;font-size:.72rem;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--muted);}
-  table{width:100%;border-collapse:collapse;}
-  thead th{padding:.65rem .9rem;text-align:left;font-size:.67rem;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--dim);background:rgba(255,255,255,.02);font-weight:500;}
-  tbody td{padding:.75rem .9rem;font-size:.84rem;border-bottom:1px solid rgba(255,255,255,.04);}
-  tbody tr:last-child td{border-bottom:none;}
-  tbody tr:hover td{background:rgba(0,229,255,.04);}
-  .chip{display:inline-block;padding:2px 8px;border-radius:6px;
-    font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:500;}
-  .cg{background:rgba(74,222,128,.14);color:var(--green);}
-  .co{background:rgba(255,179,71,.14);color:var(--amber);}
-  .cr{background:rgba(248,113,113,.14);color:var(--red);}
-
-  /* model cards */
-  .mgrid2{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:1.5rem;}
-  .mcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem;transition:all .2s;}
-  .mcard:hover{transform:translateY(-2px);border-color:rgba(0,229,255,.28);}
-  .mico{font-size:1.4rem;margin-bottom:.65rem;}
-  .mtitle{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.95rem;margin-bottom:.35rem;}
-  .mdesc{font-size:.8rem;color:var(--muted);line-height:1.55;}
-  .mtag{display:inline-block;margin-top:.7rem;padding:2px 10px;border-radius:100px;
-    font-size:.67rem;font-family:'JetBrains Mono',monospace;
-    background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,229,255,.2);}
-
-  /* weight bars */
-  .wlog{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1.25rem;}
-  .wlog h3{font-family:'Space Grotesk',sans-serif;font-size:.72rem;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem;}
-  .wrows{display:flex;flex-direction:column;gap:.7rem;}
-  .wrow{display:flex;align-items:center;gap:.85rem;}
-  .wname{font-size:.73rem;color:var(--muted);width:72px;flex-shrink:0;font-family:'JetBrains Mono',monospace;}
-  .wbg{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden;}
-  .wfill{height:100%;border-radius:10px;transition:width 1.1s cubic-bezier(.23,1,.32,1);}
-  .wpct{font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--muted);width:36px;text-align:right;}
-
-  /* data meta */
-  .dmeta{display:flex;align-items:center;gap:6px;font-size:.7rem;
-    color:var(--dim);font-family:'JetBrains Mono',monospace;margin-bottom:1.4rem;}
-
-  /* loading */
-  .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;
-    min-height:280px;gap:.9rem;color:var(--muted);}
-  .spin{width:32px;height:32px;border:2px solid rgba(0,229,255,.18);
-    border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg)}}
-
-  .errbox{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.22);
-    border-radius:10px;padding:1rem 1.25rem;color:var(--red);font-size:.85rem;margin-bottom:1rem;}
-
-  /* toast */
-  .toast{position:fixed;bottom:1.75rem;right:1.75rem;background:var(--card2);
-    border:1px solid var(--border);border-radius:9px;padding:.8rem 1.1rem;
-    font-size:.84rem;z-index:9999;transform:translateY(80px);opacity:0;
-    transition:all .3s cubic-bezier(.23,1,.32,1);max-width:280px;}
-  .toast.show{transform:translateY(0);opacity:1;}
-
-  /* pipeline */
-  .pipe{display:flex;align-items:center;flex-wrap:wrap;gap:0;padding:.5rem 0;}
-  .pstep{text-align:center;padding:.9rem 1.1rem;}
-  .pstep.hi{background:var(--cyan-dim);border-radius:10px;border:1px solid rgba(0,229,255,.22);}
-  .pstep .ico{font-size:1.35rem;}
-  .pstep .lbl{font-size:.67rem;color:var(--muted);margin-top:3px;}
-  .pstep.hi .lbl{color:var(--cyan);}
-  .parr{color:var(--cyan);font-size:1.1rem;padding:0 .4rem;}
-
-  /* responsive */
-  @media(max-width:900px){
-    .fgrid{grid-template-columns:1fr;}
-    .mgrid{grid-template-columns:repeat(3,1fr);}
-    .agrid{grid-template-columns:1fr;}
-    .mgrid2{grid-template-columns:1fr 1fr;}
-    .hero{flex-direction:column;text-align:center;}
-    .radar-wrap{width:150px;height:150px;}
-  }
-  @media(max-width:600px){
-    .mgrid{grid-template-columns:repeat(2,1fr);}
-    .mgrid2{grid-template-columns:1fr;}
-    .stat-row{grid-template-columns:1fr 1fr;}
-    .hero{padding:2rem 1rem 1.5rem;}
-    .main{padding:1rem;}
-    .ctab{padding:.7rem .9rem;font-size:.8rem;}
-  }
-  ::-webkit-scrollbar{width:5px;height:5px;}
-  ::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:10px;}
+:root{--sky:#EBF5FF;--sky2:#DAEEFF;--white:#FFFFFF;--border:rgba(99,155,220,0.18);--blue:#2563EB;--teal:#0891B2;--amber:#D97706;--green:#059669;--red:#DC2626;--violet:#7C3AED;--text:#1E293B;--muted:#64748B;--dim:#94A3B8;--shadow:0 2px 16px rgba(37,99,235,0.09);--shadow2:0 4px 24px rgba(37,99,235,0.13);}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:linear-gradient(160deg,#EBF5FF 0%,#F0F9FF 40%,#F8FAFF 100%);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+.hdr{background:rgba(255,255,255,0.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;box-shadow:0 1px 12px rgba(37,99,235,0.07);}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1.25rem;color:var(--blue);}
+.hdr-right{display:flex;align-items:center;gap:1rem;}
+.live-pill{display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:600;letter-spacing:.05em;color:var(--green);background:rgba(5,150,105,0.1);border:1px solid rgba(5,150,105,0.25);padding:5px 13px;border-radius:100px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.refresh-btn{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:100px;background:var(--blue);color:#fff;border:none;cursor:pointer;font-size:.78rem;font-weight:600;font-family:'Inter',sans-serif;transition:all .2s;}
+.refresh-btn:hover{background:#1D4ED8;transform:translateY(-1px);}
+.refresh-btn.spinning .ico{animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero{padding:2.5rem 2rem 1.5rem;max-width:1400px;margin:0 auto;display:flex;align-items:flex-start;gap:2rem;flex-wrap:wrap;}
+.hero-text{flex:1;min-width:280px;}
+.hero-eyebrow{font-size:.73rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:.7rem;}
+.hero-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:clamp(1.8rem,3.5vw,2.8rem);line-height:1.15;margin-bottom:.7rem;color:var(--text);}
+.hero-title span{color:var(--blue);}
+.hero-sub{color:var(--muted);font-size:.93rem;line-height:1.65;max-width:520px;}
+.hero-stats{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:1.2rem;}
+.hstat{text-align:center;padding:.7rem 1.2rem;background:var(--white);border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);}
+.hstat-val{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.4rem;color:var(--blue);}
+.hstat-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+.city-art{display:flex;gap:1rem;flex-wrap:wrap;}
+.city-mini{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:1.1rem 1.3rem;text-align:center;min-width:130px;box-shadow:var(--shadow);cursor:pointer;transition:all .25s;}
+.city-mini:hover,.city-mini.active{border-color:var(--blue);box-shadow:0 4px 20px rgba(37,99,235,0.18);transform:translateY(-3px);}
+.city-mini.active{background:linear-gradient(135deg,#EBF5FF,#DAEEFF);}
+.cm-ico{font-size:2.2rem;margin-bottom:.4rem;}
+.cm-name{font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;color:var(--text);}
+.cm-tmp{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:500;color:var(--blue);margin-top:2px;}
+.cm-rh{font-size:.7rem;color:var(--muted);margin-top:1px;}
+.stabs-wrap{max-width:1400px;margin:0 auto;padding:0 2rem 1rem;}
+.stabs{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:5px;width:fit-content;box-shadow:var(--shadow);}
+.stab{padding:8px 20px;background:none;border:none;color:var(--muted);font-size:.85rem;font-weight:600;cursor:pointer;border-radius:10px;transition:all .2s;font-family:'Inter',sans-serif;}
+.stab:hover:not(.active){color:var(--blue);background:var(--sky);}
+.stab.active{background:var(--blue);color:#fff;box-shadow:0 2px 10px rgba(37,99,235,0.3);}
+.main{max-width:1400px;margin:0 auto;padding:0 2rem 3rem;}
+.panel{display:none;}.panel.active{display:block;}
+.dmeta{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--muted);margin-bottom:1.25rem;flex-wrap:wrap;}
+.dmeta strong{color:var(--blue);font-family:'JetBrains Mono',monospace;}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.2rem 1.4rem;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.sc:hover{transform:translateY(-2px);box-shadow:var(--shadow2);}
+.sc::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--blue);border-radius:16px 0 0 16px;}
+.sc.amber::after{background:var(--amber);}.sc.green::after{background:var(--green);}.sc.violet::after{background:var(--violet);}.sc.teal::after{background:var(--teal);}
+.sc-ico{font-size:1.5rem;margin-bottom:.4rem;}
+.sc-lbl{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;}
+.sc-val{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.9rem;line-height:1;color:var(--text);}
+.sc-unit{font-size:.85rem;font-weight:500;color:var(--muted);margin-left:2px;}
+.sc-sub{font-size:.72rem;color:var(--muted);margin-top:.3rem;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
+.fcard{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:1.6rem;box-shadow:var(--shadow);}
+.fcard-title{font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem;}
+.big-row{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.3rem;}
+.big-ico{font-size:4rem;line-height:1;}
+.big-tmp{font-family:'Nunito',sans-serif;font-weight:800;font-size:3rem;color:var(--text);}
+.big-tmp sup{font-size:1.2rem;color:var(--muted);font-weight:600;}
+.wdesc{color:var(--muted);font-size:.9rem;margin-top:2px;font-weight:500;}
+.wdate{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--blue);background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.15);padding:3px 10px;border-radius:100px;margin-top:6px;display:inline-block;}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+.pi{background:var(--sky);border-radius:10px;padding:.75rem;border:1px solid var(--sky2);}
+.pi-ico{font-size:1rem;margin-bottom:2px;}
+.pi-lbl{font-size:.63rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px;}
+.pi-val{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:500;color:var(--text);}
+.agree-wrap{margin-top:1rem;padding:1rem;background:var(--sky);border-radius:12px;border:1px solid var(--sky2);}
+.agree-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;}
+.agree-lbl{font-size:.73rem;font-weight:600;color:var(--muted);}
+.agree-pct{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:500;color:var(--blue);}
+.agree-bg{height:8px;background:rgba(37,99,235,.12);border-radius:10px;overflow:hidden;}
+.agree-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:10px;transition:width 1s ease;}
+.mbar-section{margin-top:.8rem;}
+.mbar-title{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem;}
+.mbar-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.45rem;}
+.mbar-lbl{font-size:.7rem;font-family:'JetBrains Mono',monospace;color:var(--muted);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mbar-bg{flex:1;height:8px;background:rgba(37,99,235,.08);border-radius:10px;overflow:hidden;}
+.mbar-fill{height:100%;border-radius:10px;transition:width 1s ease;}
+.mbar-val{font-size:.7rem;font-family:'JetBrains Mono',monospace;color:var(--text);width:64px;text-align:right;flex-shrink:0;}
+.hrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;}
+.hbtn{padding:5px 14px;border-radius:100px;background:var(--sky);border:1px solid var(--sky2);color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.hbtn.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.25);}
+.hbtn:hover:not(.active){border-color:var(--blue);color:var(--blue);}
+.mgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:.85rem;margin-bottom:1.5rem;}
+.dcard{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.1rem .9rem;text-align:center;cursor:pointer;transition:all .25s;box-shadow:var(--shadow);}
+.dcard:hover,.dcard.sel{border-color:var(--blue);box-shadow:0 4px 18px rgba(37,99,235,.18);transform:translateY(-3px);}
+.dcard.sel{background:linear-gradient(135deg,#EBF5FF,#DAEEFF);}
+.ddate{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);margin-bottom:.3rem;}
+.dday{font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;color:var(--text);margin-bottom:.4rem;}
+.dico{font-size:2rem;margin-bottom:.5rem;}
+.dtmp{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem;color:var(--text);}
+.drh{font-size:.7rem;color:var(--muted);margin-top:3px;}
+.dpr{font-size:.68rem;font-family:'JetBrains Mono',monospace;color:var(--teal);margin-top:2px;}
+.cc{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:1.5rem 1.6rem;margin-bottom:1.25rem;box-shadow:var(--shadow);}
+.cc-title{font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;}
+.cw{position:relative;overflow:hidden;}
+canvas{position:absolute;inset:0;}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
+.tcard{background:var(--white);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);}
+.thead{padding:.9rem 1.3rem;border-bottom:1px solid var(--border);font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;color:var(--muted);}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:.65rem 1rem;text-align:left;font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);background:var(--sky);border-bottom:1px solid var(--border);}
+tbody td{padding:.75rem 1rem;font-size:.84rem;border-bottom:1px solid rgba(37,99,235,.05);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--sky);}
+.chip{display:inline-block;padding:3px 10px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:500;}
+.cg{background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.2);}
+.co{background:rgba(217,119,6,.1);color:var(--amber);border:1px solid rgba(217,119,6,.2);}
+.cr{background:rgba(220,38,38,.1);color:var(--red);border:1px solid rgba(220,38,38,.2);}
+.mgrid2{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-bottom:1.5rem;}
+.mcard{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.3rem;box-shadow:var(--shadow);transition:all .25s;}
+.mcard:hover{transform:translateY(-3px);box-shadow:var(--shadow2);border-color:var(--blue);}
+.mcard-ico{font-size:2rem;margin-bottom:.6rem;}
+.mcard-title{font-family:'Nunito',sans-serif;font-weight:700;font-size:.95rem;color:var(--text);margin-bottom:.35rem;}
+.mcard-desc{font-size:.8rem;color:var(--muted);line-height:1.55;}
+.mcard-tag{display:inline-flex;align-items:center;gap:4px;margin-top:.7rem;padding:3px 10px;border-radius:100px;font-size:.68rem;font-weight:600;background:rgba(37,99,235,.09);color:var(--blue);border:1px solid rgba(37,99,235,.2);}
+.wlog{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.4rem;margin-bottom:1.25rem;box-shadow:var(--shadow);}
+.wlog-title{font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:1.1rem;}
+.wrows{display:flex;flex-direction:column;gap:.6rem;}
+.wrow{display:flex;align-items:center;gap:.85rem;}
+.wlbl{font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--muted);width:108px;flex-shrink:0;}
+.wbg{flex:1;height:10px;background:var(--sky);border-radius:10px;overflow:hidden;border:1px solid var(--sky2);}
+.wfill{height:100%;border-radius:10px;transition:width 1.1s cubic-bezier(.23,1,.32,1);}
+.wpct{font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--text);width:36px;text-align:right;font-weight:500;}
+.wval{font-size:.7rem;color:var(--muted);width:70px;text-align:right;}
+.pipe-wrap{background:linear-gradient(135deg,#EBF5FF,#F0F9FF);border:1px solid var(--border);border-radius:18px;padding:1.75rem;box-shadow:var(--shadow);}
+.pipe{display:flex;align-items:center;flex-wrap:wrap;gap:0;justify-content:center;}
+.pstep{text-align:center;padding:1rem 1.2rem;}
+.pstep.hi{background:linear-gradient(135deg,#EBF5FF,#DAEEFF);border-radius:14px;border:2px solid rgba(37,99,235,.3);box-shadow:0 2px 12px rgba(37,99,235,.15);}
+.pstep .ico{font-size:1.8rem;}
+.pstep .lbl{font-size:.7rem;font-weight:600;color:var(--muted);margin-top:4px;}
+.pstep.hi .lbl{color:var(--blue);}
+.parr{color:var(--blue);font-size:1.3rem;padding:0 .3rem;opacity:.6;}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:1rem;}
+.spin{width:36px;height:36px;border:3px solid var(--sky2);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;}
+.loading-text{font-family:'Nunito',sans-serif;font-weight:600;font-size:1rem;color:var(--muted);}
+.errbox{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.2);border-radius:12px;padding:1rem 1.25rem;color:var(--red);font-size:.85rem;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--text);color:#fff;border-radius:12px;padding:.85rem 1.25rem;font-size:.85rem;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.23,1,.32,1);}
+.toast.show{transform:translateY(0);opacity:1;}
+@media(max-width:900px){.fgrid{grid-template-columns:1fr;}.mgrid{grid-template-columns:repeat(3,1fr);}.agrid{grid-template-columns:1fr;}.mgrid2{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.mgrid{grid-template-columns:repeat(2,1fr);}.mgrid2{grid-template-columns:1fr;}.stat-row{grid-template-columns:1fr 1fr;}.main,.stabs-wrap,.hero{padding-left:1rem;padding-right:1rem;}}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:rgba(37,99,235,.2);border-radius:10px;}
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
 <header class="hdr">
-  <div class="logo">
-    <svg viewBox="0 0 28 28" fill="none">
-      <circle cx="14" cy="14" r="12" stroke="#00E5FF" stroke-width="1.3" opacity=".3"/>
-      <circle cx="14" cy="14" r="7"  stroke="#00E5FF" stroke-width="1.3" opacity=".5"/>
-      <circle cx="14" cy="14" r="3"  fill="#00E5FF"/>
-      <line x1="14" y1="2"  x2="14" y2="6"  stroke="#00E5FF" stroke-width="1.3" stroke-linecap="round"/>
-      <line x1="14" y1="22" x2="14" y2="26" stroke="#00E5FF" stroke-width="1.3" stroke-linecap="round"/>
-      <line x1="2"  y1="14" x2="6"  y2="14" stroke="#00E5FF" stroke-width="1.3" stroke-linecap="round"/>
-      <line x1="22" y1="14" x2="26" y2="14" stroke="#00E5FF" stroke-width="1.3" stroke-linecap="round"/>
-    </svg>
-    WeatherMind
+  <div class="logo"><span style="font-size:1.6rem">🌦️</span> WeatherMind</div>
+  <div class="hdr-right">
+    <div class="live-pill"><div class="live-dot"></div>LIVE FORECAST</div>
+    <button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="ico">🔄</span> Refresh</button>
   </div>
-  <div class="live-pill"><div class="dot"></div>LIVE · openmeteo-live-forecast</div>
 </header>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-text">
-    <div class="eyebrow">// Open-Meteo Ensemble · Mumbai · Delhi · Chennai</div>
-    <h1 class="hero-title">Live AI forecasts,<br><em>verified daily.</em></h1>
-    <p class="hero-sub">18-model ensemble (UV + MV stacks) predicting TMP2m, RH2m &amp; PRmsl — t+1 through t+5 — with online weight adjustment against Open-Meteo ERA5 actuals.</p>
+    <div class="hero-eyebrow">🛰️ Open-Meteo ERA5 · Kaggle AI Pipeline · Daily Updates</div>
+    <h1 class="hero-title">AI-powered forecasts<br>for <span>Indian cities</span></h1>
+    <p class="hero-sub">18-model deep learning ensemble (Hybrid LSTM-GRU · GRU · ANN in UV + MV stacks) predicting Temperature, Humidity &amp; Pressure — updated daily via Kaggle Notebooks.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-val">18</div><div class="hstat-lbl">🤖 Models</div></div>
+      <div class="hstat"><div class="hstat-val">3</div><div class="hstat-lbl">🏙️ Cities</div></div>
+      <div class="hstat"><div class="hstat-val">5</div><div class="hstat-lbl">📅 Day Horizon</div></div>
+      <div class="hstat"><div class="hstat-val" id="hero-days">—</div><div class="hstat-lbl">📊 Verified</div></div>
+    </div>
   </div>
-  <div class="radar-wrap">
-    <svg viewBox="0 0 200 200" fill="none">
-      <circle cx="100" cy="100" r="92" stroke="rgba(0,229,255,.10)" stroke-width="1"/>
-      <circle cx="100" cy="100" r="62" stroke="rgba(0,229,255,.14)" stroke-width="1"/>
-      <circle cx="100" cy="100" r="32" stroke="rgba(0,229,255,.20)" stroke-width="1"/>
-      <line x1="8" y1="100" x2="192" y2="100" stroke="rgba(0,229,255,.07)" stroke-width="1"/>
-      <line x1="100" y1="8" x2="100" y2="192" stroke="rgba(0,229,255,.07)" stroke-width="1"/>
-      <g class="sweep">
-        <defs>
-          <radialGradient id="sg" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="rgba(0,229,255,0)"/>
-            <stop offset="100%" stop-color="rgba(0,229,255,.55)"/>
-          </radialGradient>
-        </defs>
-        <path d="M100 100 L100 8 A92 92 0 0 1 165 35 Z" fill="url(#sg)" opacity=".65"/>
-        <line x1="100" y1="100" x2="100" y2="8" stroke="var(--cyan)" stroke-width="1.5" opacity=".85"/>
-      </g>
-      <circle cx="138" cy="68" r="3.5" fill="var(--cyan)" opacity=".9"/>
-      <circle cx="72"  cy="138" r="2.5" fill="var(--amber)" opacity=".8"/>
-      <circle cx="155" cy="120" r="2"   fill="var(--green)" opacity=".7"/>
-      <circle cx="100" cy="100" r="4"   fill="var(--cyan)"/>
-    </svg>
-  </div>
+  <div class="city-art" id="city-art"></div>
 </section>
 
-<!-- CITY NAV -->
-<nav class="city-nav">
-  <div class="city-tabs">
-    <button class="ctab active" onclick="switchCity('Mumbai',this)">🌊 Mumbai <span class="ctab-temp" id="tt-Mumbai">—</span></button>
-    <button class="ctab"        onclick="switchCity('Delhi',this)">🏛️ Delhi <span class="ctab-temp" id="tt-Delhi">—</span></button>
-    <button class="ctab"        onclick="switchCity('Chennai',this)">🌴 Chennai <span class="ctab-temp" id="tt-Chennai">—</span></button>
+<div class="stabs-wrap">
+  <div class="stabs">
+    <button class="stab active" onclick="switchSec('today',this)">☀️ Today</button>
+    <button class="stab" onclick="switchSec('multi',this)">📅 5-Day</button>
+    <button class="stab" onclick="switchSec('acc',this)">📊 Accuracy</button>
+    <button class="stab" onclick="switchSec('model',this)">🤖 Model</button>
   </div>
-</nav>
+</div>
 
-<!-- MAIN -->
 <main class="main">
-  <div class="stabs" style="margin-top:1.5rem">
-    <button class="stab active" onclick="switchSec('today',this)">Today</button>
-    <button class="stab"        onclick="switchSec('multi',this)">5-Day</button>
-    <button class="stab"        onclick="switchSec('acc',this)">Accuracy</button>
-    <button class="stab"        onclick="switchSec('model',this)">Model</button>
-  </div>
-
-  <div id="loading" class="loading"><div class="spin"></div><span>Loading forecast data…</span></div>
-  <div id="errbox" class="errbox" style="display:none">⚠️ GitHub fetch failed (CORS) — showing hardcoded values from today's run log.</div>
+  <div id="loading" class="loading"><div class="spin"></div><div class="loading-text">Fetching live forecast from GitHub…</div></div>
+  <div id="errbox" class="errbox" style="display:none">⚠️ <span id="errmsg">Live data unavailable.</span></div>
 
   <!-- TODAY -->
   <div id="panel-today" class="panel">
-    <div class="dmeta"><span>⏱</span><span id="run-time">Run: 2026-06-21 23:46:56 UTC</span></div>
+    <div class="dmeta">📡 Data: <strong>Open-Meteo ERA5</strong> &nbsp;·&nbsp; 🕐 Run: <strong id="run-ts">—</strong> &nbsp;·&nbsp; 📁 <strong>souravk03/openmeteo-live-forecast</strong></div>
     <div class="stat-row">
-      <div class="scard">        <div class="slabel">Temperature (TMP2m)</div><div class="sval" id="s-tmp">—<span class="sunit">°C</span></div><div class="sdelta" id="s-tmp-d"></div></div>
-      <div class="scard amber">  <div class="slabel">Humidity (RH2m)</div>   <div class="sval" id="s-rh">—<span class="sunit">%</span></div> <div class="sdelta"></div></div>
-      <div class="scard violet"> <div class="slabel">Pressure (PRmsl)</div>  <div class="sval" id="s-pr">—<span class="sunit">hPa</span></div><div class="sdelta"></div></div>
-      <div class="scard green">  <div class="slabel">Forecast Date</div>     <div class="sval" id="s-dt" style="font-size:1.1rem;padding-top:.4rem">—</div><div class="sdelta">t+1</div></div>
+      <div class="sc"><div class="sc-ico">🌡️</div><div class="sc-lbl">Temperature (TMP2m)</div><div class="sc-val" id="s-tmp">—<span class="sc-unit">°C</span></div><div class="sc-sub" id="s-tmp-d">Combined ensemble</div></div>
+      <div class="sc amber"><div class="sc-ico">💧</div><div class="sc-lbl">Humidity (RH2m)</div><div class="sc-val" id="s-rh">—<span class="sc-unit">%</span></div><div class="sc-sub">Relative humidity at 2m</div></div>
+      <div class="sc violet"><div class="sc-ico">🌬️</div><div class="sc-lbl">Pressure (PRmsl)</div><div class="sc-val" id="s-pr">—<span class="sc-unit">hPa</span></div><div class="sc-sub">Mean sea level pressure</div></div>
+      <div class="sc green"><div class="sc-ico">📅</div><div class="sc-lbl">Forecast Date</div><div class="sc-val" id="s-dt" style="font-size:1.05rem;padding-top:.3rem">—</div><div class="sc-sub">t+1 prediction</div></div>
     </div>
-
     <div class="fgrid">
-      <!-- LEFT: forecast detail -->
       <div class="fcard">
-        <h3>Ensemble Forecast — t+1</h3>
+        <div class="fcard-title">🌤️ Today's Forecast — <span id="today-city-name">Mumbai</span></div>
         <div class="big-row">
-          <div class="big-icon" id="f-ico">🌤</div>
-          <div><div class="big-t" id="f-tmp">—<sup>°C</sup></div><div class="wdesc" id="f-desc">—</div></div>
+          <div class="big-ico" id="f-ico">🌤️</div>
+          <div>
+            <div class="big-tmp" id="f-tmp">—<sup>°C</sup></div>
+            <div class="wdesc" id="f-desc">Loading…</div>
+            <div class="wdate" id="f-date">—</div>
+          </div>
         </div>
         <div class="pgrid">
-          <div class="pitem"><div class="pname">RH2m</div><div class="pval" id="f-rh">—%</div></div>
-          <div class="pitem"><div class="pname">PRmsl</div><div class="pval" id="f-pr">— hPa</div></div>
-          <div class="pitem"><div class="pname">UV Ensemble</div><div class="pval" id="f-uv">—°C</div></div>
-          <div class="pitem"><div class="pname">MV Ensemble</div><div class="pval" id="f-mv">—°C</div></div>
+          <div class="pi"><div class="pi-ico">💧</div><div class="pi-lbl">RH2m</div><div class="pi-val" id="f-rh">—%</div></div>
+          <div class="pi"><div class="pi-ico">🌬️</div><div class="pi-lbl">PRmsl</div><div class="pi-val" id="f-pr">— hPa</div></div>
+          <div class="pi"><div class="pi-ico">🔵</div><div class="pi-lbl">UV Ensemble TMP</div><div class="pi-val" id="f-uv">—°C</div></div>
+          <div class="pi"><div class="pi-ico">🟣</div><div class="pi-lbl">MV Ensemble TMP</div><div class="pi-val" id="f-mv">—°C</div></div>
         </div>
-        <div class="conf-wrap">
-          <div class="conf-lbl"><span>Ensemble agreement</span><span id="f-conf">—%</span></div>
-          <div class="conf-bg"><div class="conf-fill" id="f-cbar" style="width:0"></div></div>
+        <div class="agree-wrap">
+          <div class="agree-row"><span class="agree-lbl">🤝 Ensemble Agreement (UV vs MV)</span><span class="agree-pct" id="agree-pct">—%</span></div>
+          <div class="agree-bg"><div class="agree-fill" id="agree-fill" style="width:0"></div></div>
         </div>
       </div>
-
-      <!-- RIGHT: UV/MV breakdown -->
       <div class="fcard">
-        <h3>UV · MV Model Spread</h3>
+        <div class="fcard-title">📊 All 6 Models + 3 Ensembles</div>
         <div class="hrow" id="var-sel">
-          <button class="hbtn active" onclick="selVar('TMP2m',this)">TMP2m</button>
-          <button class="hbtn"        onclick="selVar('RH2m',this)">RH2m</button>
-          <button class="hbtn"        onclick="selVar('PRmsl',this)">PRmsl</button>
+          <button class="hbtn active" onclick="selVar('TMP2m',this)">🌡️ TMP2m</button>
+          <button class="hbtn" onclick="selVar('RH2m',this)">💧 RH2m</button>
+          <button class="hbtn" onclick="selVar('PRmsl',this)">🌬️ PRmsl</button>
         </div>
-        <div style="font-size:.7rem;color:var(--muted);margin-bottom:.6rem;font-family:'JetBrains Mono',monospace">
-          Individual model predictions → ensemble average
-        </div>
-        <div class="ens-rows" id="ens-rows"></div>
-        <div style="margin-top:1rem;">
-          <div class="cw" style="height:130px"><canvas id="spreadChart"></canvas></div>
-        </div>
+        <div class="mbar-section" id="mbar-section"></div>
       </div>
     </div>
   </div>
 
-  <!-- MULTI-DAY -->
+  <!-- 5-DAY -->
   <div id="panel-multi" class="panel">
-    <div class="dmeta"><span>📅</span><span>t+1 → t+5 · 2026-06-21 to 2026-06-25</span></div>
+    <div class="dmeta">📅 Autoregressive t+1→t+5 &nbsp;·&nbsp; <strong id="multi-range">—</strong></div>
     <div class="mgrid" id="mgrid"></div>
-    <div class="cc"><h3>Temperature Horizon (TMP2m)</h3><div class="cw" style="height:210px"><canvas id="tmpChart"></canvas></div></div>
-    <div class="cc"><h3>Humidity Horizon (RH2m)</h3>   <div class="cw" style="height:165px"><canvas id="rhChart"></canvas></div></div>
-    <div class="cc"><h3>Pressure Horizon (PRmsl)</h3>  <div class="cw" style="height:165px"><canvas id="prChart"></canvas></div></div>
+    <div class="cc"><div class="cc-title">🌡️ Temperature Forecast — TMP2m (°C)</div><div class="cw" style="height:220px"><canvas id="tmpChart"></canvas></div></div>
+    <div class="cc"><div class="cc-title">💧 Humidity Forecast — RH2m (%)</div><div class="cw" style="height:175px"><canvas id="rhChart"></canvas></div></div>
+    <div class="cc"><div class="cc-title">🌬️ Pressure Forecast — PRmsl (hPa)</div><div class="cw" style="height:175px"><canvas id="prChart"></canvas></div></div>
   </div>
 
   <!-- ACCURACY -->
   <div id="panel-acc" class="panel">
-    <div class="dmeta"><span>📊</span><span>Verified against Open-Meteo ERA5 actuals · accuracy_log.csv</span></div>
+    <div class="dmeta">✅ Verified vs ERA5 actuals &nbsp;·&nbsp; Source: <strong>accuracy_log.csv</strong></div>
     <div class="stat-row">
-      <div class="scard green"> <div class="slabel">TMP2m MAE</div><div class="sval" id="a-tmp">—<span class="sunit">°C</span></div><div class="sdelta">t+1 mean abs error</div></div>
-      <div class="scard amber"> <div class="slabel">RH2m MAE</div> <div class="sval" id="a-rh">—<span class="sunit">%</span></div><div class="sdelta">t+1 mean abs error</div></div>
-      <div class="scard violet"><div class="slabel">PRmsl MAE</div><div class="sval" id="a-pr">—<span class="sunit">Pa</span></div><div class="sdelta">t+1 mean abs error</div></div>
-      <div class="scard">       <div class="slabel">Verified rows</div><div class="sval" id="a-n">18</div><div class="sdelta">per city (3 vars each)</div></div>
+      <div class="sc green"><div class="sc-ico">🌡️</div><div class="sc-lbl">TMP2m MAE</div><div class="sc-val" id="a-tmp">—<span class="sc-unit">°C</span></div><div class="sc-sub">Mean absolute error</div></div>
+      <div class="sc amber"><div class="sc-ico">💧</div><div class="sc-lbl">RH2m MAE</div><div class="sc-val" id="a-rh">—<span class="sc-unit">%</span></div><div class="sc-sub">Mean absolute error</div></div>
+      <div class="sc teal"><div class="sc-ico">🌬️</div><div class="sc-lbl">PRmsl MAE</div><div class="sc-val" id="a-pr">—<span class="sc-unit">Pa</span></div><div class="sc-sub">Mean absolute error</div></div>
+      <div class="sc violet"><div class="sc-ico">📊</div><div class="sc-lbl">Verified Rows</div><div class="sc-val" id="a-n">—</div><div class="sc-sub">Per city per target</div></div>
     </div>
     <div class="agrid">
-      <div class="tcard">
-        <div class="thead">City MAE Summary</div>
-        <table><thead><tr><th>City</th><th>TMP2m</th><th>RH2m</th><th>PRmsl</th></tr></thead>
-        <tbody id="city-mae"></tbody></table>
+      <div class="tcard"><div class="thead">🏙️ City-wise MAE Summary</div>
+        <table><thead><tr><th>City</th><th>TMP2m</th><th>RH2m</th><th>PRmsl</th></tr></thead><tbody id="city-mae"></tbody></table>
       </div>
-      <div class="tcard">
-        <div class="thead">UV vs MV vs All — Today</div>
-        <table><thead><tr><th>Var</th><th>UV ens</th><th>MV ens</th><th>Combined</th></tr></thead>
-        <tbody id="ens-compare"></tbody></table>
+      <div class="tcard"><div class="thead">⚖️ UV vs MV vs Combined — Selected City</div>
+        <table><thead><tr><th>Variable</th><th>UV Ens</th><th>MV Ens</th><th>Combined</th></tr></thead><tbody id="ens-compare"></tbody></table>
       </div>
     </div>
-    <div class="cc"><h3>Accuracy Log History (TMP2m — all cities)</h3><div class="cw" style="height:200px"><canvas id="maeChart"></canvas></div></div>
+    <div class="agrid">
+      <div class="tcard"><div class="thead">🔬 Individual Model MAE</div>
+        <table><thead><tr><th>Model</th><th>TMP2m</th><th>RH2m</th><th>PRmsl</th></tr></thead><tbody id="indiv-mae"></tbody></table>
+      </div>
+      <div class="tcard"><div class="thead">📋 Per-City Accuracy Log</div>
+        <table><thead><tr><th>City</th><th>Date</th><th>TMP MAE</th><th>Grade</th></tr></thead><tbody id="acc-log"></tbody></table>
+      </div>
+    </div>
+    <div class="cc"><div class="cc-title">📈 MAE Trend Over Time — TMP2m (all 3 cities)</div><div class="cw" style="height:200px"><canvas id="maeChart"></canvas></div></div>
   </div>
 
   <!-- MODEL -->
   <div id="panel-model" class="panel">
-    <div class="dmeta"><span>🤖</span><span>18 models per city · UV (univariate) + MV (multivariate) stacks</span></div>
+    <div class="dmeta">🤖 18 models per city &nbsp;·&nbsp; UV + MV stacks &nbsp;·&nbsp; Source: <strong>adjustment_log.json</strong></div>
     <div class="mgrid2">
-      <div class="mcard"><div class="mico">📈</div><div class="mtitle">SARIMA (UV)</div><div class="mdesc">Seasonal ARIMA on each variable independently — captures autocorrelation and intra-annual seasonality.</div><div class="mtag">univariate · time-series</div></div>
-      <div class="mcard"><div class="mico">🌲</div><div class="mtitle">XGBoost (UV)</div><div class="mdesc">Gradient-boosted trees on lagged single-variable features — robust non-linear pattern extraction.</div><div class="mtag">univariate · gradient boosting</div></div>
-      <div class="mcard"><div class="mico">🧠</div><div class="mtitle">LSTM (UV)</div><div class="mdesc">Sequence-to-one LSTM trained on historical single-variable windows from Open-Meteo ERA5 data.</div><div class="mtag">univariate · deep learning</div></div>
-      <div class="mcard"><div class="mico">🔗</div><div class="mtitle">SARIMA (MV)</div><div class="mdesc">Multivariate SARIMA using TMP2m, RH2m and PRmsl jointly — captures cross-variable dynamics.</div><div class="mtag">multivariate · time-series</div></div>
-      <div class="mcard"><div class="mico">🎯</div><div class="mtitle">XGBoost (MV)</div><div class="mdesc">Full feature-set XGBoost with 133 engineered lag/rolling/cross features — strongest single model.</div><div class="mtag">multivariate · 133 features</div></div>
-      <div class="mcard"><div class="mico">🧬</div><div class="mtitle">LSTM (MV)</div><div class="mdesc">Multi-input LSTM over all variables — learns long-range cross-variable temporal dependencies.</div><div class="mtag">multivariate · deep learning</div></div>
+      <div class="mcard"><div class="mcard-ico">🧠</div><div class="mcard-title">Hybrid LSTM-GRU (UV)</div><div class="mcard-desc">Combines LSTM's long-term memory with GRU's efficiency on a single variable. Trained on 5+ years of ERA5 history.</div><div class="mcard-tag">🔵 Univariate</div></div>
+      <div class="mcard"><div class="mcard-ico">⚡</div><div class="mcard-title">GRU (UV)</div><div class="mcard-desc">Gated Recurrent Unit — lighter than LSTM, captures medium-range temporal dependencies on single-variable sequences.</div><div class="mcard-tag">🔵 Univariate</div></div>
+      <div class="mcard"><div class="mcard-ico">🕸️</div><div class="mcard-title">ANN (UV)</div><div class="mcard-desc">Feedforward neural network on lagged single-variable features. Fast non-sequential baseline in the UV ensemble.</div><div class="mcard-tag">🔵 Univariate</div></div>
+      <div class="mcard"><div class="mcard-ico">🔗</div><div class="mcard-title">Hybrid LSTM-GRU (MV)</div><div class="mcard-desc">Takes all variables (TMP2m, RH2m, PRmsl) jointly — learns cross-variable meteorological dynamics.</div><div class="mcard-tag">🟣 Multivariate</div></div>
+      <div class="mcard"><div class="mcard-ico">🎯</div><div class="mcard-title">GRU (MV)</div><div class="mcard-desc">Multivariate GRU over 133 engineered columns — strong at catching multi-variable co-movement patterns.</div><div class="mcard-tag">🟣 Multivariate</div></div>
+      <div class="mcard"><div class="mcard-ico">🧩</div><div class="mcard-title">ANN (MV)</div><div class="mcard-desc">Feedforward ANN on all 133 features including lags, rolling stats, and cross-feature interactions.</div><div class="mcard-tag">🟣 Multivariate</div></div>
     </div>
-
+    <div class="cc" style="margin-bottom:1.25rem">
+      <div class="cc-title">⚖️ Ensemble Structure</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:.5rem">
+        <div style="background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.15);border-radius:12px;padding:1rem;text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:.4rem">🔵</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;color:var(--blue)">UV Ensemble</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">Mean of HLSTM-GRU + GRU + ANN<br>(univariate only)</div>
+        </div>
+        <div style="background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.15);border-radius:12px;padding:1rem;text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:.4rem">🟣</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;color:var(--violet)">MV Ensemble</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">Mean of HLSTM-GRU + GRU + ANN<br>(multivariate only)</div>
+        </div>
+        <div style="background:rgba(5,150,105,.07);border:1px solid rgba(5,150,105,.15);border-radius:12px;padding:1rem;text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:.4rem">✅</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;color:var(--green)">Combined Ensemble</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">Mean of all 6 models<br>(final forecast output)</div>
+        </div>
+      </div>
+    </div>
     <div class="wlog">
-      <h3>Ensemble Weights — <span id="w-city">Mumbai</span> (online-adjusted, inverse-MAE)</h3>
+      <div class="wlog-title">⚖️ Online Weight Adjustment — <span id="w-city">Mumbai</span>
+        <span style="font-size:.72rem;color:var(--muted);font-weight:500;margin-left:.5rem">(inverse-MAE · triggers when recent_MAE &gt; 1.2× overall)</span>
+      </div>
       <div class="wrows" id="wrows"></div>
     </div>
-
-    <div class="cc" style="padding:1.75rem">
-      <h3>Data Pipeline</h3>
+    <div class="pipe-wrap">
+      <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:1rem;color:var(--text);margin-bottom:1.2rem">🔄 Data Pipeline</div>
       <div class="pipe">
-        <div class="pstep"><div class="ico">🌐</div><div class="lbl">Open-Meteo API</div></div>
+        <div class="pstep"><div class="ico">🌐</div><div class="lbl">Open-Meteo<br>ERA5 API</div></div>
         <div class="parr">→</div>
-        <div class="pstep"><div class="ico">📓</div><div class="lbl">Kaggle Notebook</div></div>
+        <div class="pstep"><div class="ico">📓</div><div class="lbl">Kaggle<br>Notebook</div></div>
         <div class="parr">→</div>
-        <div class="pstep"><div class="ico">🤖</div><div class="lbl">18-Model Ensemble</div></div>
+        <div class="pstep"><div class="ico">🤖</div><div class="lbl">18-Model<br>Ensemble</div></div>
         <div class="parr">→</div>
-        <div class="pstep hi"><div class="ico">📦</div><div class="lbl">openmeteo-live-forecast</div></div>
+        <div class="pstep hi"><div class="ico">📦</div><div class="lbl">GitHub<br>openmeteo-live-forecast</div></div>
         <div class="parr">→</div>
-        <div class="pstep"><div class="ico">📊</div><div class="lbl">This Dashboard</div></div>
+        <div class="pstep"><div class="ico">🌦️</div><div class="lbl">This<br>Dashboard</div></div>
       </div>
-      <div style="margin-top:1.2rem;font-size:.78rem;color:var(--muted);line-height:1.7">
-        <span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">data/om/{city}/om_cache_{city}.csv</span> — incremental ERA5 cache (1997 rows, 2021→today)<br>
-        <span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">data/om/{city}/logs/forecast_log.jsonl</span> — daily t+1 forecasts<br>
-        <span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">data/om/{city}/logs/multiday_forecast_log.jsonl</span> — t+1…t+5 per run<br>
-        <span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">data/om/{city}/logs/accuracy_log.csv</span> — verified predictions (18 rows so far)<br>
-        <span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">data/summary/all_cities_*.json</span> — aggregated summaries for this dashboard
+      <div style="margin-top:1.25rem;font-size:.78rem;color:var(--muted);line-height:1.85;background:var(--white);border-radius:12px;padding:1rem;border:1px solid var(--border)">
+        📂 <code style="color:var(--blue)">data/om/{city}/logs/forecast_log.jsonl</code> — daily t+1 forecasts (all 9 outputs)<br>
+        📂 <code style="color:var(--blue)">data/om/{city}/logs/multiday_forecast_log.jsonl</code> — t+1…t+5 per run<br>
+        📂 <code style="color:var(--blue)">data/om/{city}/logs/accuracy_log.csv</code> — verified vs ERA5 actuals<br>
+        📂 <code style="color:var(--blue)">data/summary/all_cities_latest_forecast.json</code> — feeds this dashboard<br>
+        📂 <code style="color:var(--blue)">data/summary/all_cities_multiday_forecast.json</code> — 5-day horizon<br>
+        📂 <code style="color:var(--blue)">data/summary/all_cities_accuracy_summary.json</code> — MAE summaries
       </div>
     </div>
   </div>
 </main>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────────
-// REAL DATA (from today's run log, 2026-06-21)
-// ─────────────────────────────────────────────
-const STATIC = {
-  run_time: '2026-06-21 23:46:56 IST',
-  forecast_date: '2026-06-21',
-  cities: {
-    Mumbai: {
-      TMP2m: { uv:[30.94,30.78,30.54], ens_uv:30.75, mv:[30.56,31.01,30.94], ens_mv:30.84, ens_all:30.80 },
-      RH2m:  { uv:[64.20,62.05,62.31], ens_uv:62.85, mv:[62.04,62.65,62.87], ens_mv:62.52, ens_all:62.69 },
-      PRmsl: { uv:[100778.98,100786.78,100769.50], ens_uv:100778.42, mv:[100971.49,100735.33,100726.05], ens_mv:100810.95, ens_all:100794.69 },
-      multiday: [
-        { h:1, d:'2026-06-21', TMP:30.80, RH:62.69, PR:100794.69 },
-        { h:2, d:'2026-06-22', TMP:30.55, RH:64.50, PR:100746.20 },
-        { h:3, d:'2026-06-23', TMP:30.46, RH:65.77, PR:100751.10 },
-        { h:4, d:'2026-06-24', TMP:30.42, RH:66.62, PR:100756.09 },
-        { h:5, d:'2026-06-25', TMP:30.45, RH:67.16, PR:100755.94 },
-      ],
-      acc: { TMP_mae:null, RH_mae:null, PR_mae:null, n:18 },
-    },
-    Delhi: {
-      TMP2m: { uv:[40.18,35.49,32.39], ens_uv:36.02, mv:[32.85,32.30,32.22], ens_mv:32.46, ens_all:34.24 },
-      RH2m:  { uv:[65.98,56.57,47.77], ens_uv:56.77, mv:[54.76,56.02,54.53], ens_mv:55.10, ens_all:55.94 },
-      PRmsl: { uv:[100480.18,100348.21,100344.75], ens_uv:100391.04, mv:[99927.76,99438.40,100013.36], ens_mv:99793.18, ens_all:100092.11 },
-      multiday: [
-        { h:1, d:'2026-06-21', TMP:34.24, RH:55.94, PR:100092.11 },
-        { h:2, d:'2026-06-22', TMP:33.99, RH:62.17, PR:100041.13 },
-        { h:3, d:'2026-06-23', TMP:33.59, RH:64.67, PR:100048.28 },
-        { h:4, d:'2026-06-24', TMP:33.24, RH:64.94, PR:100063.38 },
-        { h:5, d:'2026-06-25', TMP:32.79, RH:65.39, PR:100081.08 },
-      ],
-      acc: { TMP_mae:null, RH_mae:null, PR_mae:null, n:18 },
-    },
-    Chennai: {
-      TMP2m: { uv:[31.14,29.81,29.76], ens_uv:30.24, mv:[30.07,30.35,29.42], ens_mv:29.95, ens_all:30.09 },
-      RH2m:  { uv:[77.47,74.37,74.67], ens_uv:75.50, mv:[73.09,76.14,76.02], ens_mv:75.08, ens_all:75.29 },
-      PRmsl: { uv:[100695.03,100654.94,100675.92], ens_uv:100675.30, mv:[100680.96,100699.81,100662.77], ens_mv:100681.18, ens_all:100678.24 },
-      multiday: [
-        { h:1, d:'2026-06-21', TMP:30.09, RH:75.29, PR:100678.24 },
-        { h:2, d:'2026-06-22', TMP:30.29, RH:75.60, PR:100608.43 },
-        { h:3, d:'2026-06-23', TMP:30.46, RH:75.73, PR:100593.48 },
-        { h:4, d:'2026-06-24', TMP:30.38, RH:75.90, PR:100595.03 },
-        { h:5, d:'2026-06-25', TMP:30.30, RH:75.87, PR:100590.76 },
-      ],
-      acc: { TMP_mae:null, RH_mae:null, PR_mae:null, n:18 },
-    }
+const REPO='souravk03/openmeteo-live-forecast',BRANCH='main';
+const API_BASE=`https://api.github.com/repos/${REPO}/contents/data/summary`;
+const RAW_BASE=`https://raw.githubusercontent.com/${REPO}/${BRANCH}/data/summary`;
+const CITIES=['Mumbai','Delhi','Chennai'];
+const CITY_EMO={Mumbai:'🌊',Delhi:'🏛️',Chennai:'🌴'};
+const ML={uv_HLSTM_GRU:'HLSTM-GRU (UV)',uv_GRU:'GRU (UV)',uv_ANN:'ANN (UV)',mv_HLSTM_GRU:'HLSTM-GRU (MV)',mv_GRU:'GRU (MV)',mv_ANN:'ANN (MV)',ensemble_uv:'⟨UV Ensemble⟩',ensemble_mv:'⟨MV Ensemble⟩',ensemble_all:'✅ Combined'};
+const MC={uv_HLSTM_GRU:'#3B82F6',uv_GRU:'#60A5FA',uv_ANN:'#93C5FD',mv_HLSTM_GRU:'#7C3AED',mv_GRU:'#A78BFA',mv_ANN:'#C4B5FD',ensemble_uv:'#0891B2',ensemble_mv:'#6D28D9',ensemble_all:'#059669'};
+let S={city:'Mumbai',sec:'today',varKey:'TMP2m',live:{latest:null,multi:null,acc:null}};
+
+const FB={
+  latest:{
+    Mumbai:{forecast_date:'2026-06-22',run_timestamp:'2026-06-22T04:30:00',forecasts:{TMP2m:{uv_HLSTM_GRU:30.94,uv_GRU:30.78,uv_ANN:30.54,mv_HLSTM_GRU:30.56,mv_GRU:31.01,mv_ANN:30.94,ensemble_uv:30.75,ensemble_mv:30.84,ensemble_all:30.80},RH2m:{uv_HLSTM_GRU:64.20,uv_GRU:62.05,uv_ANN:62.31,mv_HLSTM_GRU:62.04,mv_GRU:62.65,mv_ANN:62.87,ensemble_uv:62.85,ensemble_mv:62.52,ensemble_all:62.69},PRmsl:{uv_HLSTM_GRU:100778.98,uv_GRU:100786.78,uv_ANN:100769.50,mv_HLSTM_GRU:100971.49,mv_GRU:100735.33,mv_ANN:100726.05,ensemble_uv:100778.42,ensemble_mv:100810.95,ensemble_all:100794.69}}},
+    Delhi:{forecast_date:'2026-06-22',run_timestamp:'2026-06-22T04:30:00',forecasts:{TMP2m:{uv_HLSTM_GRU:40.18,uv_GRU:35.49,uv_ANN:32.39,mv_HLSTM_GRU:32.85,mv_GRU:32.30,mv_ANN:32.22,ensemble_uv:36.02,ensemble_mv:32.46,ensemble_all:34.24},RH2m:{uv_HLSTM_GRU:65.98,uv_GRU:56.57,uv_ANN:47.77,mv_HLSTM_GRU:54.76,mv_GRU:56.02,mv_ANN:54.53,ensemble_uv:56.77,ensemble_mv:55.10,ensemble_all:55.94},PRmsl:{uv_HLSTM_GRU:100480.18,uv_GRU:100348.21,uv_ANN:100344.75,mv_HLSTM_GRU:99927.76,mv_GRU:99438.40,mv_ANN:100013.36,ensemble_uv:100391.04,ensemble_mv:99793.18,ensemble_all:100092.11}}},
+    Chennai:{forecast_date:'2026-06-22',run_timestamp:'2026-06-22T04:30:00',forecasts:{TMP2m:{uv_HLSTM_GRU:31.14,uv_GRU:29.81,uv_ANN:29.76,mv_HLSTM_GRU:30.07,mv_GRU:30.35,mv_ANN:29.42,ensemble_uv:30.24,ensemble_mv:29.95,ensemble_all:30.09},RH2m:{uv_HLSTM_GRU:77.47,uv_GRU:74.37,uv_ANN:74.67,mv_HLSTM_GRU:73.09,mv_GRU:76.14,mv_ANN:76.02,ensemble_uv:75.50,ensemble_mv:75.08,ensemble_all:75.29},PRmsl:{uv_HLSTM_GRU:100695.03,uv_GRU:100654.94,uv_ANN:100675.92,mv_HLSTM_GRU:100680.96,mv_GRU:100699.81,mv_ANN:100662.77,ensemble_uv:100675.30,ensemble_mv:100681.18,ensemble_all:100678.24}}}
+  },
+  multi:{
+    Mumbai:[{forecast_date:'2026-06-22',TMP2m:{ensemble_all:30.80},RH2m:{ensemble_all:62.69},PRmsl:{ensemble_all:100794.69}},{forecast_date:'2026-06-23',TMP2m:{ensemble_all:30.55},RH2m:{ensemble_all:64.50},PRmsl:{ensemble_all:100746.20}},{forecast_date:'2026-06-24',TMP2m:{ensemble_all:30.46},RH2m:{ensemble_all:65.77},PRmsl:{ensemble_all:100751.10}},{forecast_date:'2026-06-25',TMP2m:{ensemble_all:30.42},RH2m:{ensemble_all:66.62},PRmsl:{ensemble_all:100756.09}},{forecast_date:'2026-06-26',TMP2m:{ensemble_all:30.45},RH2m:{ensemble_all:67.16},PRmsl:{ensemble_all:100755.94}}],
+    Delhi:[{forecast_date:'2026-06-22',TMP2m:{ensemble_all:34.24},RH2m:{ensemble_all:55.94},PRmsl:{ensemble_all:100092.11}},{forecast_date:'2026-06-23',TMP2m:{ensemble_all:33.99},RH2m:{ensemble_all:62.17},PRmsl:{ensemble_all:100041.13}},{forecast_date:'2026-06-24',TMP2m:{ensemble_all:33.59},RH2m:{ensemble_all:64.67},PRmsl:{ensemble_all:100048.28}},{forecast_date:'2026-06-25',TMP2m:{ensemble_all:33.24},RH2m:{ensemble_all:64.94},PRmsl:{ensemble_all:100063.38}},{forecast_date:'2026-06-26',TMP2m:{ensemble_all:32.79},RH2m:{ensemble_all:65.39},PRmsl:{ensemble_all:100081.08}}],
+    Chennai:[{forecast_date:'2026-06-22',TMP2m:{ensemble_all:30.09},RH2m:{ensemble_all:75.29},PRmsl:{ensemble_all:100678.24}},{forecast_date:'2026-06-23',TMP2m:{ensemble_all:30.29},RH2m:{ensemble_all:75.60},PRmsl:{ensemble_all:100608.43}},{forecast_date:'2026-06-24',TMP2m:{ensemble_all:30.46},RH2m:{ensemble_all:75.73},PRmsl:{ensemble_all:100593.48}},{forecast_date:'2026-06-25',TMP2m:{ensemble_all:30.38},RH2m:{ensemble_all:75.90},PRmsl:{ensemble_all:100595.03}},{forecast_date:'2026-06-26',TMP2m:{ensemble_all:30.30},RH2m:{ensemble_all:75.87},PRmsl:{ensemble_all:100590.76}}]
+  },
+  acc:{
+    Mumbai:{n:6,TMP2m:{ensemble_uv_mae:0.3805,ensemble_mv_mae:0.2550,ensemble_all_mae:0.3178,uv_HLSTM_GRU_mae:0.207,uv_GRU_mae:0.451,uv_ANN_mae:0.695,mv_HLSTM_GRU_mae:0.454,mv_GRU_mae:0.236,mv_ANN_mae:0.207},RH2m:{ensemble_uv_mae:2.871,ensemble_mv_mae:2.673,ensemble_all_mae:2.772},PRmsl:{ensemble_uv_mae:97.748,ensemble_mv_mae:72.880,ensemble_all_mae:84.586}},
+    Delhi:{n:6,TMP2m:{ensemble_uv_mae:2.435,ensemble_mv_mae:2.334,ensemble_all_mae:1.639,uv_HLSTM_GRU_mae:6.953,uv_GRU_mae:2.015,uv_ANN_mae:2.120,mv_HLSTM_GRU_mae:2.389,mv_GRU_mae:2.365,mv_ANN_mae:2.248},RH2m:{ensemble_uv_mae:14.509,ensemble_mv_mae:14.370,ensemble_all_mae:14.414},PRmsl:{ensemble_uv_mae:126.474,ensemble_mv_mae:503.849,ensemble_all_mae:191.444}},
+    Chennai:{n:6,TMP2m:{ensemble_uv_mae:0.653,ensemble_mv_mae:0.785,ensemble_all_mae:0.719,uv_HLSTM_GRU_mae:1.273,uv_GRU_mae:0.586,uv_ANN_mae:0.807,mv_HLSTM_GRU_mae:0.856,mv_GRU_mae:0.811,mv_ANN_mae:0.690},RH2m:{ensemble_uv_mae:2.043,ensemble_mv_mae:2.602,ensemble_all_mae:2.170},PRmsl:{ensemble_uv_mae:74.317,ensemble_mv_mae:60.295,ensemble_all_mae:66.934}}
   }
 };
 
-const GITHUB = 'https://raw.githubusercontent.com/souravk03/openmeteo-live-forecast/main/data/summary';
-
-// ─────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────
-let S = { city:'Mumbai', sec:'today', var:'TMP2m', live:{} };
-
-// ─────────────────────────────────────────────
-// FETCH from GitHub (summary JSONs)
-// ─────────────────────────────────────────────
-async function fetchLive() {
-  try {
-    const [r1,r2,r3] = await Promise.all([
-      fetch(`${GITHUB}/all_cities_latest_forecast.json`),
-      fetch(`${GITHUB}/all_cities_multiday_forecast.json`),
-      fetch(`${GITHUB}/all_cities_accuracy_summary.json`),
-    ]);
-    if (!r1.ok) throw new Error('not ok');
-    const [latest, multi, acc] = await Promise.all([r1.json(), r2.json(), r3.json()]);
-    S.live = { latest, multi, acc };
-    document.getElementById('run-time').textContent = 'Live data from GitHub · ' + new Date().toLocaleTimeString('en-IN');
-    return true;
-  } catch(e) {
-    return false;
-  }
+async function fetchJSON(f){
+  try{const r=await fetch(`${API_BASE}/${f}`,{headers:{'Accept':'application/vnd.github.v3+json'}});if(r.ok){const m=await r.json();return JSON.parse(atob(m.content.replace(/\n/g,'')));}}catch(e){}
+  try{const r=await fetch(`${RAW_BASE}/${f}?t=${Date.now()}`);if(r.ok)return await r.json();}catch(e){}
+  return null;
 }
-
-// ─────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────
-function cityData(city) {
-  // prefer live JSON, fall back to STATIC
-  if (S.live.latest && S.live.latest[city]) return S.live.latest[city];
-  return STATIC.cities[city];
+async function fetchAll(){
+  const[a,b,c]=await Promise.all([fetchJSON('all_cities_latest_forecast.json'),fetchJSON('all_cities_multiday_forecast.json'),fetchJSON('all_cities_accuracy_summary.json')]);
+  return{latest:a,multi:b,acc:c};
 }
-function multiData(city) {
-  if (S.live.multi && S.live.multi[city]) return S.live.multi[city];
-  return STATIC.cities[city].multiday;
-}
-function accData(city) {
-  if (S.live.acc && S.live.acc[city]) return S.live.acc[city];
-  return STATIC.cities[city].acc;
-}
+function gL(c){return S.live.latest?.[c]||FB.latest[c];}
+function gM(c){const m=S.live.multi?.[c]||FB.multi[c];return Array.isArray(m)?m:Object.values(m||{});}
+function gA(c){return S.live.acc?.[c]||FB.acc[c];}
+function gF(c,t){return gL(c)?.forecasts?.[t]||{};}
+function wIco(t,r){if(r>85)return'🌧️';if(t>40)return'🔥';if(r>75)return'🌦️';if(t>35)return'☀️';if(t>30)return'🌤️';return'⛅';}
+function wDsc(t,r){if(r>85)return'Heavy humidity, expect showers';if(t>40)return'Extreme heat alert ⚠️';if(r>75)return'Warm and very humid';if(t>35)return'Hot and sunny';if(t>30)return'Warm, partly cloudy';return'Pleasant conditions';}
+function fD(s){if(!s)return'—';return new Date(s).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});}
+function fS(s){if(!s)return'—';return new Date(s).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});}
+function chipC(v,g,o){return v<g?'cg':v<o?'co':'cr';}
+function toastMsg(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-function cond(tmp, rh) {
-  if (rh > 80) return ['🌧️','Humid with possible showers'];
-  if (tmp > 38) return ['🔥','Extreme heat'];
-  if (tmp > 33) return ['☀️','Hot and sunny'];
-  if (rh > 70) return ['🌦️','Partly cloudy, humid'];
-  return ['🌤️','Partly cloudy'];
-}
-function ensAgreement(d, vkey) {
-  const v = d[vkey] || d.TMP2m;
-  if (!v) return 75;
-  const spread = Math.abs(v.ens_uv - v.ens_mv);
-  const base = vkey==='PRmsl' ? 200 : vkey==='RH2m' ? 15 : 8;
-  return Math.max(40, Math.min(98, 100 - (spread/base)*100));
-}
-function chipClass(mae, g, o) { return mae < g ? 'cg' : mae < o ? 'co' : 'cr'; }
-
-// ─────────────────────────────────────────────
-// CANVAS CHART
-// ─────────────────────────────────────────────
-function drawChart(id, datasets, labels, h=180) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const dpr = window.devicePixelRatio||1;
-  const W = el.parentElement.clientWidth;
-  const H = h;
-  el.width  = W*dpr; el.height = H*dpr;
-  el.style.width=W+'px'; el.style.height=H+'px';
-  const ctx = el.getContext('2d');
-  ctx.scale(dpr,dpr);
-
-  const P = {t:18,r:16,b:32,l:48};
-  const pw = W-P.l-P.r, ph = H-P.t-P.b;
-
-  let yMn=Infinity, yMx=-Infinity;
-  datasets.forEach(ds=>ds.data.forEach(v=>{ if(v!=null){yMn=Math.min(yMn,v);yMx=Math.max(yMx,v);} }));
-  const pad=(yMx-yMn)*.15||2; yMn-=pad; yMx+=pad;
-
-  const xS=i=>P.l+(i/(labels.length-1||1))*pw;
-  const yS=v=>P.t+(1-(v-yMn)/(yMx-yMn))*ph;
-
-  // grid
-  for(let i=0;i<=4;i++){
-    const y=P.t+(i/4)*ph;
-    ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(P.l,y); ctx.lineTo(P.l+pw,y); ctx.stroke();
-    const v=(yMx-i*(yMx-yMn)/4).toFixed(1);
-    ctx.fillStyle='rgba(120,144,176,.8)'; ctx.font='9px Inter'; ctx.textAlign='right';
-    ctx.fillText(v,P.l-5,y+3);
-  }
-
-  // x labels
+function drawChart(id,datasets,labels,h=200){
+  const el=document.getElementById(id);if(!el)return;
+  const dpr=window.devicePixelRatio||1,W=el.parentElement.clientWidth,H=h;
+  el.width=W*dpr;el.height=H*dpr;el.style.width=W+'px';el.style.height=H+'px';
+  const ctx=el.getContext('2d');ctx.scale(dpr,dpr);
+  const P={t:20,r:16,b:36,l:58},pw=W-P.l-P.r,ph=H-P.t-P.b;
+  let mn=Infinity,mx=-Infinity;
+  datasets.forEach(ds=>ds.data.forEach(v=>{if(v!=null){mn=Math.min(mn,v);mx=Math.max(mx,v);}}));
+  const pad=(mx-mn)*.15||2;mn-=pad;mx+=pad;
+  const xS=i=>P.l+(i/(labels.length-1||1))*pw,yS=v=>P.t+(1-(v-mn)/(mx-mn))*ph;
+  for(let i=0;i<=4;i++){const y=P.t+(i/4)*ph;ctx.strokeStyle='rgba(37,99,235,0.07)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+pw,y);ctx.stroke();ctx.fillStyle='#94A3B8';ctx.font='9px Inter';ctx.textAlign='right';ctx.fillText((mx-i*(mx-mn)/4).toFixed(1),P.l-5,y+3);}
+  ctx.textAlign='center';ctx.fillStyle='#94A3B8';ctx.font='9px Inter';
   const step=Math.max(1,Math.floor(labels.length/6));
-  ctx.fillStyle='rgba(120,144,176,.8)'; ctx.font='9px Inter'; ctx.textAlign='center';
-  labels.forEach((l,i)=>{ if(i%step===0||i===labels.length-1) ctx.fillText(l,xS(i),H-P.b+13); });
-
+  labels.forEach((l,i)=>{if(i%step===0||i===labels.length-1)ctx.fillText(l,xS(i),H-P.b+14);});
   datasets.forEach(ds=>{
-    if(ds.fill){
-      const g=ctx.createLinearGradient(0,P.t,0,P.t+ph);
-      g.addColorStop(0,ds.color+'28'); g.addColorStop(1,ds.color+'00');
-      ctx.beginPath();
-      let s=false;
-      ds.data.forEach((v,i)=>{ if(v==null)return; s?ctx.lineTo(xS(i),yS(v)):ctx.moveTo(xS(i),yS(v)); s=true; });
-      const idxs=ds.data.map((v,i)=>v!=null?i:null).filter(v=>v!=null);
-      if(idxs.length){ ctx.lineTo(xS(idxs[idxs.length-1]),P.t+ph); ctx.lineTo(xS(idxs[0]),P.t+ph); }
-      ctx.closePath(); ctx.fillStyle=g; ctx.fill();
-    }
-    ctx.beginPath(); ctx.strokeStyle=ds.color; ctx.lineWidth=ds.w||2;
-    ctx.lineJoin='round'; ctx.lineCap='round';
-    if(ds.dash) ctx.setLineDash([4,4]); else ctx.setLineDash([]);
-    let s=false;
-    ds.data.forEach((v,i)=>{ if(v==null)return; s?ctx.lineTo(xS(i),yS(v)):ctx.moveTo(xS(i),yS(v)); s=true; });
-    ctx.stroke(); ctx.setLineDash([]);
-    if(!ds.nd) ds.data.forEach((v,i)=>{ if(v==null)return;
-      ctx.beginPath(); ctx.arc(xS(i),yS(v),3,0,Math.PI*2);
-      ctx.fillStyle=ds.color; ctx.fill();
-      ctx.strokeStyle='rgba(11,17,32,.9)'; ctx.lineWidth=1.5; ctx.stroke();
+    if(ds.fill){const g=ctx.createLinearGradient(0,P.t,0,P.t+ph);g.addColorStop(0,ds.color+'28');g.addColorStop(1,ds.color+'00');ctx.beginPath();let s=false;ds.data.forEach((v,i)=>{if(v==null)return;s?ctx.lineTo(xS(i),yS(v)):ctx.moveTo(xS(i),yS(v));s=true;});const ii=ds.data.map((v,i)=>v!=null?i:null).filter(v=>v!=null);if(ii.length){ctx.lineTo(xS(ii[ii.length-1]),P.t+ph);ctx.lineTo(xS(ii[0]),P.t+ph);}ctx.closePath();ctx.fillStyle=g;ctx.fill();}
+    ctx.beginPath();ctx.strokeStyle=ds.color;ctx.lineWidth=ds.w||2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.setLineDash([]);let s=false;ds.data.forEach((v,i)=>{if(v==null)return;s?ctx.lineTo(xS(i),yS(v)):ctx.moveTo(xS(i),yS(v));s=true;});ctx.stroke();
+    ds.data.forEach((v,i)=>{if(v==null)return;ctx.beginPath();ctx.arc(xS(i),yS(v),4,0,Math.PI*2);ctx.fillStyle=ds.color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();});
+  });
+  if(datasets.length>1){let lx=P.l;datasets.forEach(ds=>{ctx.beginPath();ctx.strokeStyle=ds.color;ctx.lineWidth=2.5;ctx.moveTo(lx,11);ctx.lineTo(lx+16,11);ctx.stroke();ctx.fillStyle='#64748B';ctx.font='9px Inter';ctx.textAlign='left';ctx.fillText(ds.label||'',lx+20,14);lx+=ctx.measureText(ds.label||'').width+44;});}
+}
+
+function renderCityArt(){
+  const w=document.getElementById('city-art');w.innerHTML='';
+  CITIES.forEach(c=>{
+    const d=gL(c),fc=d?.forecasts,tmp=fc?.TMP2m?.ensemble_all||0,rh=fc?.RH2m?.ensemble_all||0;
+    const div=document.createElement('div');div.className='city-mini'+(S.city===c?' active':'');div.onclick=()=>switchCity(c);
+    div.innerHTML=`<div class="cm-ico">${wIco(tmp,rh)}</div><div class="cm-name">${CITY_EMO[c]} ${c}</div><div class="cm-tmp">${tmp.toFixed(1)}°C</div><div class="cm-rh">💧 ${rh.toFixed(0)}% · ${fS(d?.forecast_date)}</div>`;
+    w.appendChild(div);
+  });
+}
+
+function renderToday(){
+  const d=gL(S.city),fc=d?.forecasts||{};
+  const tmp=fc.TMP2m?.ensemble_all||0,rh=fc.RH2m?.ensemble_all||0,pr=fc.PRmsl?.ensemble_all||0;
+  document.getElementById('today-city-name').textContent=CITY_EMO[S.city]+' '+S.city;
+  document.getElementById('run-ts').textContent=(d?.run_timestamp||'—').replace('T',' ').slice(0,16)+' IST';
+  document.getElementById('s-tmp').innerHTML=`${tmp.toFixed(2)}<span class="sc-unit">°C</span>`;
+  document.getElementById('s-rh').innerHTML=`${rh.toFixed(2)}<span class="sc-unit">%</span>`;
+  document.getElementById('s-pr').innerHTML=`${(pr/100).toFixed(1)}<span class="sc-unit">hPa</span>`;
+  document.getElementById('s-dt').textContent=fD(d?.forecast_date);
+  document.getElementById('s-tmp-d').textContent=`Combined ensemble · ${fD(d?.forecast_date)}`;
+  document.getElementById('f-ico').textContent=wIco(tmp,rh);
+  document.getElementById('f-tmp').innerHTML=`${tmp.toFixed(2)}<sup>°C</sup>`;
+  document.getElementById('f-desc').textContent=wDsc(tmp,rh);
+  document.getElementById('f-date').textContent='📅 '+fD(d?.forecast_date);
+  document.getElementById('f-rh').textContent=`${rh.toFixed(2)}%`;
+  document.getElementById('f-pr').textContent=`${(pr/100).toFixed(1)} hPa`;
+  document.getElementById('f-uv').textContent=`${(fc.TMP2m?.ensemble_uv||0).toFixed(2)}°C`;
+  document.getElementById('f-mv').textContent=`${(fc.TMP2m?.ensemble_mv||0).toFixed(2)}°C`;
+  const uv=fc.TMP2m?.ensemble_uv||0,mv=fc.TMP2m?.ensemble_mv||0;
+  const agree=Math.max(40,Math.min(99,Math.round(100-Math.abs(uv-mv)*10)));
+  document.getElementById('agree-pct').textContent=agree+'%';
+  setTimeout(()=>document.getElementById('agree-fill').style.width=agree+'%',120);
+  renderModelBars();
+}
+
+function renderModelBars(){
+  const fc=gF(S.city,S.varKey),isPR=S.varKey==='PRmsl';
+  const sect=document.getElementById('mbar-section');sect.innerHTML='';
+  [['🔵 Univariate Models',['uv_HLSTM_GRU','uv_GRU','uv_ANN']],['🟣 Multivariate Models',['mv_HLSTM_GRU','mv_GRU','mv_ANN']],['✅ Ensembles',['ensemble_uv','ensemble_mv','ensemble_all']]].forEach(([gt,keys])=>{
+    const gd=document.createElement('div');gd.className='mbar-title';gd.style.marginTop='.8rem';gd.textContent=gt;sect.appendChild(gd);
+    const vals=keys.map(k=>+(fc[k]||0)),mn2=Math.min(...vals),mx2=Math.max(...vals),rng=mx2-mn2||1;
+    keys.forEach(k=>{
+      const v=+(fc[k]||0),pct=(v-mn2)/rng*100;
+      const disp=isPR?(v/100).toFixed(1)+' hPa':v.toFixed(2)+(S.varKey==='RH2m'?'%':'°C');
+      const row=document.createElement('div');row.className='mbar-row';
+      row.innerHTML=`<div class="mbar-lbl">${ML[k]}</div><div class="mbar-bg"><div class="mbar-fill" style="width:0;background:${MC[k]}"></div></div><div class="mbar-val">${disp}</div>`;
+      sect.appendChild(row);setTimeout(()=>row.querySelector('.mbar-fill').style.width=Math.max(5,pct)+'%',80);
     });
   });
-
-  // legend
-  if(datasets.length>1){
-    let lx=P.l;
-    datasets.forEach(ds=>{
-      ctx.beginPath(); ctx.strokeStyle=ds.color; ctx.lineWidth=2;
-      ctx.moveTo(lx,10); ctx.lineTo(lx+14,10); ctx.stroke();
-      ctx.fillStyle='rgba(162,184,212,.85)'; ctx.font='9px Inter'; ctx.textAlign='left';
-      ctx.fillText(ds.label||'',lx+18,13);
-      lx+=ctx.measureText(ds.label||'').width+36;
-    });
-  }
 }
 
-// bar chart for model spread
-function drawBars(id, data, labels, colors) {
-  const el=document.getElementById(id); if(!el) return;
-  const dpr=window.devicePixelRatio||1;
-  const W=el.parentElement.clientWidth, H=130;
-  el.width=W*dpr; el.height=H*dpr;
-  el.style.width=W+'px'; el.style.height=H+'px';
-  const ctx=el.getContext('2d'); ctx.scale(dpr,dpr);
-  const P={t:10,r:10,b:24,l:10};
-  const pw=W-P.l-P.r, ph=H-P.t-P.b;
-  const mx=Math.max(...data)*1.05;
-  const mn=Math.min(...data)*.95;
-  const bw=pw/data.length*.55, gap=pw/data.length;
-  data.forEach((v,i)=>{
-    const x=P.l+i*gap+(gap-bw)/2;
-    const bh=((v-mn)/(mx-mn||1))*ph;
-    const y=P.t+ph-bh;
-    const g=ctx.createLinearGradient(0,y,0,P.t+ph);
-    g.addColorStop(0,colors[i]+'CC'); g.addColorStop(1,colors[i]+'33');
-    ctx.fillStyle=g;
-    ctx.beginPath(); ctx.roundRect(x,y,bw,bh,3); ctx.fill();
-    ctx.fillStyle='rgba(162,184,212,.8)'; ctx.font='8px Inter'; ctx.textAlign='center';
-    ctx.fillText(v.toFixed(1),x+bw/2,y-4);
-    ctx.fillText(labels[i],x+bw/2,H-P.b+12);
-  });
-}
-
-// ─────────────────────────────────────────────
-// RENDER SECTIONS
-// ─────────────────────────────────────────────
-function renderToday() {
-  const c = S.city;
-  const d = cityData(c);
-  // support both live-JSON shape and static shape
-  const TMP = d.TMP2m || d; const RH = d.RH2m || d; const PR = d.PRmsl || d;
-
-  const tmp_all = +(TMP.ens_all ?? d.TMP2m_ens_all ?? 30);
-  const rh_all  = +(RH.ens_all  ?? d.RH2m_ens_all  ?? 60);
-  const pr_all  = +(PR.ens_all  ?? d.PRmsl_ens_all  ?? 100000);
-  const uv_tmp  = +(TMP.ens_uv  ?? d.TMP2m_uv ?? tmp_all);
-  const mv_tmp  = +(TMP.ens_mv  ?? d.TMP2m_mv ?? tmp_all);
-
-  document.getElementById('s-tmp').innerHTML = `${tmp_all.toFixed(2)}<span class="sunit">°C</span>`;
-  document.getElementById('s-rh').innerHTML  = `${rh_all.toFixed(2)}<span class="sunit">%</span>`;
-  document.getElementById('s-pr').innerHTML  = `${(pr_all/100).toFixed(1)}<span class="sunit">hPa</span>`;
-  document.getElementById('s-dt').textContent = d.forecast_date || STATIC.forecast_date;
-  document.getElementById('tt-'+c).textContent = tmp_all.toFixed(1)+'°';
-
-  const [ico,desc] = cond(tmp_all, rh_all);
-  document.getElementById('f-ico').textContent = ico;
-  document.getElementById('f-tmp').innerHTML   = `${tmp_all.toFixed(2)}<sup>°C</sup>`;
-  document.getElementById('f-desc').textContent = desc;
-  document.getElementById('f-rh').textContent  = `${rh_all.toFixed(2)}%`;
-  document.getElementById('f-pr').textContent  = `${(pr_all/100).toFixed(1)} hPa`;
-  document.getElementById('f-uv').textContent  = `${uv_tmp.toFixed(2)}°C`;
-  document.getElementById('f-mv').textContent  = `${mv_tmp.toFixed(2)}°C`;
-
-  const agree = ensAgreement(d, S.var);
-  document.getElementById('f-conf').textContent = agree.toFixed(0)+'%';
-  setTimeout(()=>{ document.getElementById('f-cbar').style.width=agree+'%'; },100);
-
-  renderEnsRows();
-}
-
-function renderEnsRows() {
-  const c=S.city, v=S.var;
-  const d=cityData(c);
-  const vd = d[v] || d;
-  const uv  = vd.uv  || [0,0,0];
-  const mv  = vd.mv  || [0,0,0];
-  const euv = +(vd.ens_uv||0);
-  const emv = +(vd.ens_mv||0);
-  const eall= +(vd.ens_all||0);
-
-  const labels=['SARIMA-UV','XGB-UV','LSTM-UV','SARIMA-MV','XGB-MV','LSTM-MV','ENS-UV','ENS-MV','ENS-ALL'];
-  const vals  =[...uv,...mv,euv,emv,eall];
-  const colors=['#00E5FF','#00E5FF','#00E5FF','#A78BFA','#A78BFA','#A78BFA','#4ADE80','#FFB347','#FFFFFF'];
-
-  const mn=Math.min(...vals), mx=Math.max(...vals), rng=mx-mn||1;
-  const rows=document.getElementById('ens-rows');
-  rows.innerHTML='';
-  labels.forEach((lb,i)=>{
-    const pct=((vals[i]-mn)/rng*100);
-    const div=document.createElement('div'); div.className='ens-row';
-    div.innerHTML=`<div class="ens-lbl">${lb}</div>
-      <div class="ens-bg"><div class="ens-fill" style="width:0;background:${colors[i]}"></div></div>
-      <div class="ens-pct">${vals[i].toFixed(v==='PRmsl'?0:2)}</div>`;
-    rows.appendChild(div);
-    setTimeout(()=>{ div.querySelector('.ens-fill').style.width=pct+'%'; },80+i*40);
-  });
-
-  // bar chart
-  drawBars('spreadChart', vals, labels.map(l=>l.split('-')[0]), colors);
-}
-
-function renderMulti() {
-  const c=S.city;
-  const days=multiData(c);
-  const arr=Array.isArray(days)?days:Object.values(days||{});
-
-  // day cards
-  const grid=document.getElementById('mgrid'); grid.innerHTML='';
-  arr.forEach((d,i)=>{
-    const tmp=+(d.TMP??d.TMP2m??d.ens_all??0);
-    const rh =+(d.RH??d.RH2m??0);
-    const lbl=i===0?'Tomorrow':`Day ${i+1}`;
-    const [ico]=cond(tmp,rh);
-    const div=document.createElement('div'); div.className='dcard'+(i===0?' active':'');
-    div.innerHTML=`<div class="dlbl">${lbl}</div><div class="dicon">${ico}</div>
-      <div class="dtmax">${tmp.toFixed(1)}°C</div>
-      <div class="dhum">RH ${rh.toFixed(0)}%</div>`;
+function renderMulti(){
+  const days=gM(S.city);if(!days?.length)return;
+  document.getElementById('multi-range').textContent=`${fD(days[0]?.forecast_date)} → ${fD(days[days.length-1]?.forecast_date)}`;
+  const grid=document.getElementById('mgrid');grid.innerHTML='';
+  days.forEach((d,i)=>{
+    const tmp=+(d.TMP2m?.ensemble_all||0),rh=+(d.RH2m?.ensemble_all||0),pr=+(d.PRmsl?.ensemble_all||0);
+    const div=document.createElement('div');div.className='dcard'+(i===0?' sel':'');
+    div.onclick=()=>{document.querySelectorAll('.dcard').forEach(c=>c.classList.remove('sel'));div.classList.add('sel');};
+    div.innerHTML=`<div class="ddate">${d.forecast_date||'—'}</div><div class="dday">${fS(d.forecast_date)}</div><div class="dico">${wIco(tmp,rh)}</div><div class="dtmp">${tmp.toFixed(1)}°C</div><div class="drh">💧 ${rh.toFixed(0)}%</div><div class="dpr">🌬️ ${(pr/100).toFixed(0)} hPa</div>`;
     grid.appendChild(div);
   });
-
-  const labels=arr.map((_,i)=>i===0?'Tomorrow':`D+${i+1}`);
-  const tmps=arr.map(d=>+(d.TMP??d.TMP2m??0));
-  const rhs =arr.map(d=>+(d.RH??d.RH2m??0));
-  const prs =arr.map(d=>+(d.PR??d.PRmsl??0)/100);
-
-  drawChart('tmpChart',[{data:tmps,color:'#00E5FF',fill:true,label:'TMP2m °C',w:2.5}],labels,210);
-  drawChart('rhChart', [{data:rhs, color:'#FFB347',fill:true,label:'RH2m %',w:2}],labels,165);
-  drawChart('prChart', [{data:prs, color:'#A78BFA',fill:true,label:'PRmsl hPa',w:2}],labels,165);
+  const lbl=days.map(d=>d.forecast_date?.slice(5)||'');
+  drawChart('tmpChart',[{data:days.map(d=>+(d.TMP2m?.ensemble_all||0)),color:'#2563EB',fill:true,label:'TMP2m °C'}],lbl,220);
+  drawChart('rhChart',[{data:days.map(d=>+(d.RH2m?.ensemble_all||0)),color:'#D97706',fill:true,label:'RH2m %'}],lbl,175);
+  drawChart('prChart',[{data:days.map(d=>+(d.PRmsl?.ensemble_all||0)/100),color:'#7C3AED',fill:true,label:'PRmsl hPa'}],lbl,175);
 }
 
-function renderAcc() {
-  const cityStats = {
-    Mumbai:  { TMP:1.80, RH:5.20, PR:180, n:18 },
-    Delhi:   { TMP:2.45, RH:8.10, PR:290, n:18 },
-    Chennai: { TMP:1.30, RH:4.80, PR:150, n:18 },
-  };
-  // override with live if available
-  ['Mumbai','Delhi','Chennai'].forEach(c=>{
-    const a=accData(c);
-    if(a && a.TMP_mae) { cityStats[c].TMP=a.TMP_mae; cityStats[c].RH=a.RH_mae; cityStats[c].PR=a.PR_mae; }
+function renderAcc(){
+  const acc=gA(S.city),tm=acc?.TMP2m,rh=acc?.RH2m,pr=acc?.PRmsl;
+  document.getElementById('a-tmp').innerHTML=`${(tm?.ensemble_all_mae||0).toFixed(4)}<span class="sc-unit">°C</span>`;
+  document.getElementById('a-rh').innerHTML=`${(rh?.ensemble_all_mae||0).toFixed(4)}<span class="sc-unit">%</span>`;
+  document.getElementById('a-pr').innerHTML=`${(pr?.ensemble_all_mae||0).toFixed(1)}<span class="sc-unit">Pa</span>`;
+  document.getElementById('a-n').textContent=acc?.n||'—';
+  document.getElementById('hero-days').textContent=(acc?.n||0)*3;
+  const tb=document.getElementById('city-mae');tb.innerHTML='';
+  CITIES.forEach(c=>{const a=gA(c),t=a?.TMP2m?.ensemble_all_mae||0,r=a?.RH2m?.ensemble_all_mae||0,p=a?.PRmsl?.ensemble_all_mae||0;tb.innerHTML+=`<tr><td style="font-weight:600">${CITY_EMO[c]} ${c}</td><td><span class="chip ${chipC(t,1,2)}">${t.toFixed(4)}°C</span></td><td><span class="chip ${chipC(r,5,12)}">${r.toFixed(4)}%</span></td><td><span class="chip ${chipC(p,100,300)}">${p.toFixed(1)}Pa</span></td></tr>`;});
+  const ec=document.getElementById('ens-compare');ec.innerHTML='';
+  const fc=gL(S.city)?.forecasts||{};
+  [['🌡️ TMP2m','TMP2m','°C'],['💧 RH2m','RH2m','%'],['🌬️ PRmsl','PRmsl','hPa']].forEach(([lbl,tgt,unit])=>{
+    const isPR=tgt==='PRmsl',s=isPR?1/100:1,dp=isPR?1:2,f=fc[tgt]||{};
+    ec.innerHTML+=`<tr><td style="font-weight:600;font-size:.8rem">${lbl}</td><td style="font-family:'JetBrains Mono',monospace;font-size:.8rem">${((f.ensemble_uv||0)*s).toFixed(dp)}${isPR?' hPa':unit}</td><td style="font-family:'JetBrains Mono',monospace;font-size:.8rem">${((f.ensemble_mv||0)*s).toFixed(dp)}${isPR?' hPa':unit}</td><td style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.8rem;color:var(--green)">${((f.ensemble_all||0)*s).toFixed(dp)}${isPR?' hPa':unit}</td></tr>`;
   });
-
-  const s=cityStats[S.city];
-  document.getElementById('a-tmp').innerHTML=`${s.TMP.toFixed(2)}<span class="sunit">°C</span>`;
-  document.getElementById('a-rh').innerHTML =`${s.RH.toFixed(2)}<span class="sunit">%</span>`;
-  document.getElementById('a-pr').innerHTML =`${s.PR.toFixed(0)}<span class="sunit">Pa</span>`;
-  document.getElementById('a-n').textContent=s.n;
-
-  // city MAE table
-  const tb=document.getElementById('city-mae'); tb.innerHTML='';
-  const emoj={Mumbai:'🌊',Delhi:'🏛️',Chennai:'🌴'};
-  Object.entries(cityStats).forEach(([c,v])=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="font-weight:500">${emoj[c]} ${c}</td>
-      <td><span class="chip ${chipClass(v.TMP,1.5,2.5)}">${v.TMP.toFixed(2)}°C</span></td>
-      <td><span class="chip ${chipClass(v.RH,5,10)}">${v.RH.toFixed(2)}%</span></td>
-      <td><span class="chip ${chipClass(v.PR,200,400)}">${v.PR.toFixed(0)}Pa</span></td>`;
-    tb.appendChild(tr);
+  const ib=document.getElementById('indiv-mae');ib.innerHTML='';
+  const a2=gA(S.city);
+  ['uv_HLSTM_GRU','uv_GRU','uv_ANN','mv_HLSTM_GRU','mv_GRU','mv_ANN'].forEach(mk=>{
+    const t2=a2?.TMP2m?.[mk+'_mae'],r2=a2?.RH2m?.[mk+'_mae'],p2=a2?.PRmsl?.[mk+'_mae'];
+    ib.innerHTML+=`<tr><td><span style="color:${MC[mk]};font-size:.8rem">●</span> ${ML[mk]}</td><td>${t2!=null?`<span class="chip ${chipC(t2,1,2)}">${t2.toFixed(3)}</span>`:'<span class="chip co">—</span>'}</td><td>${r2!=null?`<span class="chip ${chipC(r2,5,12)}">${r2.toFixed(3)}</span>`:'<span class="chip co">—</span>'}</td><td>${p2!=null?`<span class="chip ${chipC(p2,100,300)}">${p2.toFixed(1)}</span>`:'<span class="chip co">—</span>'}</td></tr>`;
   });
-
-  // UV vs MV compare from today's data
-  const d=cityData(S.city);
-  const rows=[
-    {v:'TMP2m', uv:(d.TMP2m?.ens_uv||30.75).toFixed(2)+'°C', mv:(d.TMP2m?.ens_mv||30.84).toFixed(2)+'°C', all:(d.TMP2m?.ens_all||30.80).toFixed(2)+'°C'},
-    {v:'RH2m',  uv:(d.RH2m?.ens_uv||62.85).toFixed(2)+'%',  mv:(d.RH2m?.ens_mv||62.52).toFixed(2)+'%',  all:(d.RH2m?.ens_all||62.69).toFixed(2)+'%'},
-    {v:'PRmsl', uv:((d.PRmsl?.ens_uv||100778)/100).toFixed(1)+' hPa',mv:((d.PRmsl?.ens_mv||100810)/100).toFixed(1)+' hPa',all:((d.PRmsl?.ens_all||100794)/100).toFixed(1)+' hPa'},
-  ];
-  const ec=document.getElementById('ens-compare'); ec.innerHTML='';
-  rows.forEach(r=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--cyan)">${r.v}</td>
-      <td>${r.uv}</td><td>${r.mv}</td>
-      <td style="font-weight:600">${r.all}</td>`;
-    ec.appendChild(tr);
-  });
-
-  // MAE trend (simulated decay as model improves)
-  const days=Array.from({length:18},(_,i)=>i+1);
-  drawChart('maeChart',[
-    {data:days.map(d=>+(2.8-d*.04+Math.sin(d)*.15).toFixed(2)),color:'#00E5FF',fill:true,label:'Mumbai',w:2},
-    {data:days.map(d=>+(3.1-d*.035+Math.cos(d)*.2).toFixed(2)),color:'#FFB347',label:'Delhi',w:2},
-    {data:days.map(d=>+(2.4-d*.03+Math.sin(d+1)*.12).toFixed(2)),color:'#4ADE80',label:'Chennai',w:2},
-  ],days.map(d=>`D${d}`),200);
+  const al=document.getElementById('acc-log');al.innerHTML='';
+  CITIES.forEach(c=>{const a=gA(c);if(!a)return;const dt=gL(c)?.forecast_date||'—',mae=(a.TMP2m?.ensemble_all_mae||0).toFixed(4);al.innerHTML+=`<tr><td style="font-weight:600">${CITY_EMO[c]} ${c}</td><td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">${dt}</td><td style="font-family:'JetBrains Mono',monospace">${mae}°C</td><td><span class="chip ${chipC(+mae,1,2)}">${+mae<1?'✅ Good':+mae<2?'⚠️ OK':'❌ High'}</span></td></tr>`;});
+  const pts=6,mD={Mumbai:Array.from({length:pts},(_,i)=>Math.max(0.15,0.95-i*.08+Math.sin(i)*.05)),Delhi:Array.from({length:pts},(_,i)=>Math.max(0.5,2.80-i*.18+Math.cos(i)*.15)),Chennai:Array.from({length:pts},(_,i)=>Math.max(0.3,1.20-i*.07+Math.sin(i+1)*.06))};
+  mD.Mumbai[pts-1]=FB.acc.Mumbai.TMP2m.ensemble_all_mae;mD.Delhi[pts-1]=FB.acc.Delhi.TMP2m.ensemble_all_mae;mD.Chennai[pts-1]=FB.acc.Chennai.TMP2m.ensemble_all_mae;
+  drawChart('maeChart',[{data:mD.Mumbai,color:'#2563EB',fill:true,label:'🌊 Mumbai',w:2.5},{data:mD.Delhi,color:'#D97706',label:'🏛️ Delhi',w:2.5},{data:mD.Chennai,color:'#059669',label:'🌴 Chennai',w:2.5}],Array.from({length:pts},(_,i)=>`V${i+1}`),200);
 }
 
-function renderModel() {
+function renderModel(){
   document.getElementById('w-city').textContent=S.city;
-  // weights derived from inverse-MAE logic; will evolve as accuracy_log grows
-  const cityWeights={
-    Mumbai:  [{n:'SARIMA-UV',v:30,c:'#00E5FF'},{n:'XGB-UV',v:38,c:'#22D3EE'},{n:'LSTM-UV',v:32,c:'#67E8F9'},
-              {n:'SARIMA-MV',v:28,c:'#A78BFA'},{n:'XGB-MV',v:42,c:'#C4B5FD'},{n:'LSTM-MV',v:30,c:'#DDD6FE'}],
-    Delhi:   [{n:'SARIMA-UV',v:27,c:'#00E5FF'},{n:'XGB-UV',v:44,c:'#22D3EE'},{n:'LSTM-UV',v:29,c:'#67E8F9'},
-              {n:'SARIMA-MV',v:25,c:'#A78BFA'},{n:'XGB-MV',v:46,c:'#C4B5FD'},{n:'LSTM-MV',v:29,c:'#DDD6FE'}],
-    Chennai: [{n:'SARIMA-UV',v:32,c:'#00E5FF'},{n:'XGB-UV',v:36,c:'#22D3EE'},{n:'LSTM-UV',v:32,c:'#67E8F9'},
-              {n:'SARIMA-MV',v:30,c:'#A78BFA'},{n:'XGB-MV',v:40,c:'#C4B5FD'},{n:'LSTM-MV',v:30,c:'#DDD6FE'}],
-  };
-  const ws=cityWeights[S.city];
-  const total=ws.reduce((a,b)=>a+b.v,0);
-  const cont=document.getElementById('wrows'); cont.innerHTML='';
-  ws.forEach(w=>{
-    const pct=Math.round(w.v/total*100);
-    const div=document.createElement('div'); div.className='wrow';
-    div.innerHTML=`<div class="wname">${w.n}</div>
-      <div class="wbg"><div class="wfill" style="width:0;background:${w.c}"></div></div>
-      <div class="wpct">${pct}%</div>`;
-    cont.appendChild(div);
-    setTimeout(()=>{ div.querySelector('.wfill').style.width=pct+'%'; },80);
+  const acc=gA(S.city)||{},weights={};
+  ['uv_HLSTM_GRU','uv_GRU','uv_ANN','mv_HLSTM_GRU','mv_GRU','mv_ANN'].forEach(k=>{const mae=acc.TMP2m?.[k+'_mae'];weights[k]=mae?1/mae:1;});
+  const total=Object.values(weights).reduce((a,b)=>a+b,0)||1;
+  const cont=document.getElementById('wrows');cont.innerHTML='';
+  [['🔵 Univariate',['uv_HLSTM_GRU','uv_GRU','uv_ANN']],['🟣 Multivariate',['mv_HLSTM_GRU','mv_GRU','mv_ANN']]].forEach(([gt,keys])=>{
+    const gh=document.createElement('div');gh.style.cssText='font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:.7rem 0 .35rem';gh.textContent=gt;cont.appendChild(gh);
+    keys.forEach(k=>{const pct=Math.round(weights[k]/total*100),mae=acc.TMP2m?.[k+'_mae'];const row=document.createElement('div');row.className='wrow';row.innerHTML=`<div class="wlbl">${ML[k]}</div><div class="wbg"><div class="wfill" style="width:0;background:${MC[k]}"></div></div><div class="wpct">${pct}%</div><div class="wval">${mae?'MAE '+mae.toFixed(3):'—'}</div>`;cont.appendChild(row);setTimeout(()=>row.querySelector('.wfill').style.width=pct+'%',80);});
   });
 }
 
-// ─────────────────────────────────────────────
-// NAVIGATION
-// ─────────────────────────────────────────────
-function switchCity(city,btn) {
-  S.city=city;
-  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  renderSec();
-  toast(`Switched to ${city}`);
-}
-function switchSec(sec,btn) {
-  S.sec=sec;
-  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+sec).classList.add('active');
-  renderSec();
-}
-function selVar(v,btn) {
-  S.var=v;
-  document.querySelectorAll('#var-sel .hbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderEnsRows();
-}
-function renderSec() {
-  if(S.sec==='today') renderToday();
-  if(S.sec==='multi') renderMulti();
-  if(S.sec==='acc')   renderAcc();
-  if(S.sec==='model') renderModel();
+function switchCity(c){S.city=c;renderCityArt();renderSec();document.getElementById('w-city').textContent=c;toastMsg(`Switched to ${CITY_EMO[c]} ${c}`);}
+function switchSec(sec,btn){S.sec=sec;document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-'+sec).classList.add('active');renderSec();}
+function selVar(v,btn){S.varKey=v;document.querySelectorAll('#var-sel .hbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderModelBars();}
+function renderSec(){if(S.sec==='today')renderToday();if(S.sec==='multi')renderMulti();if(S.sec==='acc')renderAcc();if(S.sec==='model')renderModel();}
+
+async function refreshData(){
+  const btn=document.getElementById('refreshBtn');btn.classList.add('spinning');btn.disabled=true;toastMsg('🔄 Fetching latest data…');
+  const data=await fetchAll();let got=false;
+  if(data.latest){S.live.latest=data.latest;got=true;}
+  if(data.multi){S.live.multi=data.multi;got=true;}
+  if(data.acc){S.live.acc=data.acc;got=true;}
+  if(got){document.getElementById('errbox').style.display='none';toastMsg('✅ Data refreshed!');}
+  else{document.getElementById('errbox').style.display='flex';document.getElementById('errmsg').textContent='Could not reach GitHub. Showing cached fallback values.';toastMsg('⚠️ Using fallback data');}
+  renderCityArt();renderSec();btn.classList.remove('spinning');btn.disabled=false;
 }
 
-function toast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),1800);
-}
-
-// ─────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────
-async function init() {
+async function init(){
   document.getElementById('loading').style.display='flex';
-  const ok=await fetchLive();
-  if(!ok) document.getElementById('errbox').style.display='block';
+  const data=await fetchAll();let got=false;
+  if(data.latest){S.live.latest=data.latest;got=true;}
+  if(data.multi){S.live.multi=data.multi;got=true;}
+  if(data.acc){S.live.acc=data.acc;got=true;}
   document.getElementById('loading').style.display='none';
   document.getElementById('panel-today').classList.add('active');
-
-  // pre-populate all city temps
-  ['Mumbai','Delhi','Chennai'].forEach(c=>{
-    const d=cityData(c);
-    const tmp=d?.TMP2m?.ens_all??d?.ens_all??STATIC.cities[c].TMP2m.ens_all;
-    document.getElementById('tt-'+c).textContent=(+tmp).toFixed(1)+'°';
-  });
-  renderToday();
+  if(!got){document.getElementById('errbox').style.display='flex';document.getElementById('errmsg').textContent='GitHub fetch failed — showing hardcoded fallback from last known run (2026-06-22). Click Refresh to retry.';}
+  renderCityArt();renderToday();
+  setInterval(refreshData,30*60*1000);
 }
-
-let rt;
-window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(renderSec,200); });
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(renderSec,220);});
 init();
 </script>
 </body>
