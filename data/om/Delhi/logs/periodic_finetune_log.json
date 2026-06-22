@@ -1,0 +1,175 @@
+[
+  {
+    "date": "2026-06-22",
+    "city": "Delhi",
+    "n_rows": 1966,
+    "lr": 2e-05,
+    "max_epochs": 40,
+    "models": {
+      "uv_HLSTM_GRU_PRmsl": {
+        "pre_val_loss": 0.033603,
+        "post_val_loss": 0.01153,
+        "improved": true,
+        "epochs_run": 33,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "uv_GRU_PRmsl": {
+        "pre_val_loss": 0.02381,
+        "post_val_loss": 0.010164,
+        "improved": true,
+        "epochs_run": 33,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "uv_ANN_PRmsl": {
+        "pre_val_loss": 0.040769,
+        "post_val_loss": 0.027725,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_HLSTM_GRU_PRmsl": {
+        "pre_val_loss": 0.148671,
+        "post_val_loss": 0.048605,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_GRU_PRmsl": {
+        "pre_val_loss": 0.057744,
+        "post_val_loss": 0.043232,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_ANN_PRmsl": {
+        "pre_val_loss": 0.03771,
+        "post_val_loss": 0.021468,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "uv_HLSTM_GRU_RH2m": {
+        "pre_val_loss": 0.387827,
+        "post_val_loss": 0.278291,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "uv_GRU_RH2m": {
+        "pre_val_loss": 0.257223,
+        "post_val_loss": 0.205779,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "uv_ANN_RH2m": {
+        "pre_val_loss": 0.274675,
+        "post_val_loss": 0.215686,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_HLSTM_GRU_RH2m": {
+        "pre_val_loss": 0.338978,
+        "post_val_loss": 0.231774,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_GRU_RH2m": {
+        "pre_val_loss": 0.301662,
+        "post_val_loss": 0.232117,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_ANN_RH2m": {
+        "pre_val_loss": 0.323624,
+        "post_val_loss": 0.237633,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "uv_HLSTM_GRU_TMP2m": {
+        "pre_val_loss": 0.174568,
+        "post_val_loss": 0.15661,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "uv_GRU_TMP2m": {
+        "pre_val_loss": 0.194983,
+        "post_val_loss": 0.208113,
+        "improved": false,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "uv_ANN_TMP2m": {
+        "pre_val_loss": 0.235898,
+        "post_val_loss": 0.177474,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_HLSTM_GRU_TMP2m": {
+        "pre_val_loss": 0.252959,
+        "post_val_loss": 0.220201,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_GRU_TMP2m": {
+        "pre_val_loss": 0.211931,
+        "post_val_loss": 0.202404,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      },
+      "mv_ANN_TMP2m": {
+        "pre_val_loss": 0.220126,
+        "post_val_loss": 0.158593,
+        "improved": true,
+        "epochs_run": 6,
+        "n_train": 1716,
+        "n_val": 190,
+        "skipped": false
+      }
+    },
+    "skipped": false,
+    "n_models_ok": 18
+  }
+]
